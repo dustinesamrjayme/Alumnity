@@ -1,0 +1,129 @@
+// Chart styles for the dashboard. Uses the app's CSS variables where they exist,
+// with fallbacks taken from the PLV admin mockup.
+:host {
+  --d-ink: var(--ink, #14284b);
+  --d-blue: var(--blue, #2457a6);
+  --d-green: var(--green, #1f7a58);
+  --d-tint: var(--tint, #dce8f5);
+  --d-line: var(--line, #d5dee9);
+  --d-mute: var(--mute, #5c6b85);
+  --d-card: var(--card, #fff);
+  --d-yellow: #e8c15a;
+}
+
+.chart {
+  margin-top: 16px;
+
+  h2 { margin: 0 0 8px; }
+
+  svg { width: 100%; height: auto; display: block; }
+}
+
+.ax { fill: var(--d-mute); font: 500 11px system-ui, sans-serif; }
+.gl line { stroke: var(--d-line); stroke-width: 1; }
+
+.ar { fill: var(--d-tint); opacity: 0.7; }
+.ln {
+  fill: none;
+  stroke: var(--d-blue);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pt { fill: var(--d-card); stroke: var(--d-blue); stroke-width: 2.5; }
+
+.up { color: var(--d-green); font-weight: 700; font-size: 13px; margin-top: 8px; }
+
+// Donut
+.dn {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  svg { width: 140px; flex: none; }
+
+  .num { font-size: 28px; font-weight: 700; fill: var(--d-ink); }
+}
+.track { stroke: var(--d-line); opacity: 0.5; }
+.seg-in { stroke: var(--d-green); }
+.seg-out { stroke: var(--d-yellow); }
+
+.legend {
+  display: grid;
+  gap: 6px;
+}
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  &.in { background: var(--d-green); }
+  &.out { background: var(--d-yellow); }
+}
+
+// Horizontal bars
+.bars { display: grid; gap: 12px; }
+.br {
+  display: grid;
+  grid-template-columns: minmax(70px, 38%) 1fr 40px;
+  gap: 10px;
+  align-items: center;
+  font-weight: 500;
+
+  .br-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  b { text-align: right; }
+}
+.bar {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--paper, #fcfdfe);
+  border: 1px solid var(--d-line);
+  min-width: 60px;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    background: var(--d-blue);
+  }
+}
+
+// Table + status pills (from the PLV admin mockup)
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 320px; }
+th {
+  text-align: left;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--d-mute);
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--d-line);
+}
+td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--d-line);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: 0; }
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.pg { background: var(--d-green); color: #fff; }                 // green
+  &.pr { background: var(--red, #c94a4a); color: #fff; }            // red
+  &.pt { background: var(--d-tint); color: var(--d-ink); }          // open (tint)
+  &.pf {                                                            // outlined
+    background: var(--paper, #fcfdfe);
+    border: 1px solid var(--d-line);
+    color: var(--d-ink);
+  }
+}

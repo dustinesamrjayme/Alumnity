@@ -30,7 +30,7 @@ import { DemoStore } from '../../core/demo-store.service';
           <button type="submit" class="btn primary full">Save changes</button>
         </form>
         <div class="section"><h2>Organizer tools</h2></div>
-        
+         <a class="btn soft full" routerLink="/admin/dashboard">Open organizer workspace</a>
         <button class="btn outline full mt" (click)="logout()">Log out</button>
         <button class="btn outline full mt" (click)="reset()">Reset demo data</button>
       </div>
@@ -38,7 +38,7 @@ import { DemoStore } from '../../core/demo-store.service';
   `,
 })
 
-// <a class="btn soft full" routerLink="/admin/dashboard">Open organizer workspace</a>
+
 export class ProfilePage {
   store = inject(DemoStore);
   private router = inject(Router);

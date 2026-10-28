@@ -8,6 +8,7 @@ import { DemoStore } from '../../core/demo-store.service';
   selector: 'app-admin-events',
   standalone: true,
   imports: [IonContent, RouterLink, AppHeaderComponent],
+  styleUrl: '../../../theme/backup.scss',
   template: `
     <app-header />
     <ion-content>
