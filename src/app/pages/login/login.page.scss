@@ -1,0 +1,131 @@
+/* Login page — scoped to LoginPage */
+
+ion-content.login-content {
+  --background: var(--navy);
+}
+
+.login-screen {
+  background: var(--navy);
+  min-height: 100%;
+  padding: 0 0 28px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Decorative background shapes */
+.login-screen:before,
+.login-screen:after {
+  content: "";
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border-radius: 42%;
+  background: #2457A6;
+  opacity: .18;
+  transform: rotate(28deg);
+}
+
+.login-screen:before {
+  top: -100px;
+  left: -95px;
+}
+
+.login-screen:after {
+  top: 45px;
+  right: -145px;
+}
+
+/* Brand block */
+.login-brand {
+  position: relative;
+  z-index: 1;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 35px 20px 45px;
+}
+
+.login-brand img {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  margin-bottom: 13px;
+}
+
+.login-brand h1 {
+  font: 800 30px/1.05 Manrope, sans-serif;
+  margin: 0;
+  color: #fff;
+  letter-spacing: -.04em;
+}
+
+.login-brand p {
+  font: 500 13px/1.4 'DM Sans', sans-serif;
+  color: #8bd1b1;
+  margin: 7px 0 0;
+}
+
+/* Form panel */
+.login-panel {
+  position: relative;
+  z-index: 2;
+  background: var(--paper);
+  color: var(--navy);
+  border-radius: 27px 27px 0 0;
+  padding: 27px 22px 24px;
+  flex: 1;
+  min-height: 430px;
+  margin-top: -1px;
+}
+
+.login-panel .title {
+  font-size: 27px;
+  letter-spacing: -.035em;
+}
+
+.login-panel .sub {
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.login-panel .form {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.login-panel input {
+  height: 48px;
+}
+
+.login-panel .primary {
+  height: 48px;
+  border-radius: 12px;
+}
+
+.login-panel .login-links {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 17px;
+  color: var(--muted);
+}
+
+.login-panel .login-links a {
+  color: var(--blue);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-panel .demo-note {
+  font-size: 10px;
+  text-align: center;
+  color: #8491a5;
+  margin-top: 22px;
+}

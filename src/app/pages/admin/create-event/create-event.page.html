@@ -1,0 +1,24 @@
+<app-header />
+<ion-content>
+  <div class="main">
+    <a class="back" routerLink="/admin/events">← Manage events</a>
+    <div class="eyebrow">Event setup</div>
+    <h1 class="title">{{ id ? 'Edit event' : 'Create event' }}</h1>
+    <p class="sub">Keep event information clear and easy to scan.</p>
+    <form class="form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field"><label>Event name</label><input formControlName="title" placeholder="Grand Alumni Homecoming" /></div>
+      <div class="field"><label>Date and time</label><input type="datetime-local" formControlName="startsAt" /></div>
+      <div class="field"><label>Venue</label><input formControlName="venue" placeholder="PLV Gymnasium" /></div>
+      <div class="form-grid">
+        <div class="field"><label>Fee (₱)</label><input type="number" min="0" formControlName="fee" /></div>
+        <div class="field"><label>Capacity</label><input type="number" min="1" formControlName="capacity" placeholder="200" /></div>
+      </div>
+      <div class="field"><label>Description</label><textarea rows="4" formControlName="description" placeholder="Event description"></textarea></div>
+      <div class="field"><label>Banner image</label>
+        <button type="button" class="btn outline full" (click)="store.toast('Image upload is not connected in this prototype.')">＋ Choose image</button>
+      </div>
+      @if (submitted && form.invalid) { <div style="color:var(--red);font-size:12px;margin-bottom:10px">Complete the name, date, venue and capacity.</div> }
+      <button type="submit" class="btn primary full">Save event</button>
+    </form>
+  </div>
+</ion-content>
