@@ -12,7 +12,7 @@ import { DemoStore } from '../core/demo-store.service';
       <ion-toolbar class="plv-top">
         <div class="top">
           <a class="brand" routerLink="/tabs/events">
-            <img class="brand-logo" src="assets/plv-alumni-logo.svg" alt="PLV Alumni Events logo" />
+            <img class="brand-logo" src="assets/logo.jpg" />
             <span>PLV<br /><span class="brand-sub">Alumni Events</span></span>
           </a>
           <a class="avatar" routerLink="/tabs/profile" aria-label="Profile">{{ store.initials() }}</a>
