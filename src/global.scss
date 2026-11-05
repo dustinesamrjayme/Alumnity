@@ -691,6 +691,10 @@ ion-app {
   margin: 0 auto;
 }
 
+ion-app:has(.dash-page) {
+  width: 100%;
+}
+
 /* Desktop phone frame (disabled)
 @media (min-width: 700px) {
   ion-app {

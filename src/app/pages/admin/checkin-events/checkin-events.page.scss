@@ -1,1 +1,38 @@
 // Styles for checkin-events page
+// ---------- Web layout (CSS only) ----------
+.main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+// Search box stays a sensible width on wide screens
+.search { max-width: 420px; }
+
+// Event cards in a responsive grid
+.scan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+
+  .card {
+    margin-bottom: 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+
+    // button always sits at the bottom, with a guaranteed gap above it
+    .btn.mt2 { margin-top: auto; }
+    .row { margin-bottom: 18px; }
+  }
+
+  // "No events match" spans the whole grid
+  .empty { grid-column: 1 / -1; }
+}
+
+@media (max-width: 560px) {
+  .main { padding: 16px; }
+  .search { max-width: none; }
+  .scan-grid { grid-template-columns: 1fr; }
+}

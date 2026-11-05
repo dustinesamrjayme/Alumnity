@@ -1,1 +1,57 @@
-// Styles for attendees page
+// ---------- Web layout (CSS only) ----------
+.main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+// Left: stats, actions, search. Right: attendee list.
+.desk {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.desk-side {
+  position: sticky;
+  top: 16px;
+
+  // Stack the two stat cards in the narrow column
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.desk-list {
+  min-width: 0;
+
+  // list heading starts flush with the top of the column
+  .section { margin-top: 0; }
+}
+
+.attendee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+
+  .card {
+    margin-bottom: 0;
+    padding: 20px;
+  }
+
+  .event-bottom { margin-top: 16px; }
+
+  // "No attendees found" spans the whole grid
+  .empty { grid-column: 1 / -1; }
+}
+
+// ---------- Responsive ----------
+@media (max-width: 900px) {
+  .desk { grid-template-columns: 1fr; }
+  .desk-side { position: static; }
+}
+
+@media (max-width: 560px) {
+  .main { padding: 16px; }
+  .attendee-grid { grid-template-columns: 1fr; }
+}// Styles for attendees page
