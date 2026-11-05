@@ -16,6 +16,11 @@ const ADMIN: TabDef[] = [
   { tab: 'events', label: 'Events', icon: 'albums-outline' },
   { tab: 'checkin', label: 'Check-in', icon: 'scan-outline' },
 ];
+const VOLUNTEER: TabDef[] = [
+  { tab: 'scanner', label: 'Scanner', icon: 'scan-outline' },
+  { tab: 'profile', label: 'Profile', icon: 'person-outline' },
+  { tab: 'events', label: 'Events', icon: 'albums-outline' },
+];
 
 /** One tab shell, two modes: attendee (/tabs) and organizer (/admin), chosen by route data. */
 @Component({
@@ -36,7 +41,8 @@ const ADMIN: TabDef[] = [
   `,
 })
 export class ShellPage {
-  tabs = inject(ActivatedRoute).snapshot.data['kind'] === 'admin' ? ADMIN : ATTENDEE;
+  private kind = inject(ActivatedRoute).snapshot.data['kind'];
+  tabs = this.kind === 'admin' ? ADMIN : this.kind === 'volunteer' ? VOLUNTEER : ATTENDEE;
   constructor() {
     addIcons({ gridOutline, ticketOutline, personOutline, albumsOutline, scanOutline });
   }
