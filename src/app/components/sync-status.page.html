@@ -1,0 +1,78 @@
+<!-- sync-status.page.html -->
+<ion-content>
+  <div class="main sync-page">
+    <a class="back" (click)="location.back()" role="button" tabindex="0"
+       (keyup.enter)="location.back()">← Back</a>
+
+    <div class="eyebrow">Online / offline</div>
+    <h1 class="title">Sync status</h1>
+    <p class="sub">Check the queue before the event. Pending check-ins sync when you reconnect.</p>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <span>Connection</span>
+        <strong>
+          <span class="pill" [class.green]="net.online()" [class.yellow]="!net.online()">
+            {{ net.online() ? 'Online' : 'Offline' }}
+          </span>
+        </strong>
+        <small class="small">Current network status</small>
+      </div>
+      <div class="stat">
+        <span>Pending check-ins</span>
+        <strong>{{ checkIn.pendingCount() }}</strong>
+        <small class="small">Waiting to sync</small>
+      </div>
+      <div class="stat">
+        <span>Last synced</span>
+        <strong class="stat-text">{{ checkIn.lastSyncAt() ?? 'Never' }}</strong>
+        <small class="small">Device clock</small>
+      </div>
+    </div>
+
+    @if (auth.currentRole() === 'volunteer') {
+      <div class="section"><h2>Queued check-ins</h2></div>
+      @if (checkIn.queue().length === 0) {
+        <div class="empty">Nothing queued. Every scan has been synced.</div>
+      } @else {
+        <ul class="queue">
+          @for (item of checkIn.queue(); track item.client_id) {
+            <li class="listrow row between">
+              <div>
+                <h3>Registration #{{ item.registration_id }}</h3>
+                <p>{{ item.device_time }} · {{ item.is_offline ? 'offline scan' : 'online' }}</p>
+              </div>
+              <span class="pill yellow">Pending</span>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    <div class="section"><h2>Actions</h2></div>
+    <div class="action-grid">
+      <div class="card">
+        <div class="row">
+          <span class="mini green">↻</span>
+          <div class="grow">
+            <h3 class="h3">Sync pending records</h3>
+            <p class="small">Upload queued check-ins to the server.</p>
+          </div>
+        </div>
+        <button class="btn primary full mt2"
+                [disabled]="!net.online() || checkIn.pendingCount() === 0"
+                (click)="sync()">Sync now</button>
+      </div>
+      <div class="card">
+        <div class="row">
+          <span class="mini">×</span>
+          <div class="grow">
+            <h3 class="h3">Clear cached attendee lists</h3>
+            <p class="small">Free space if cached data looks stale.</p>
+          </div>
+        </div>
+        <button class="btn outline full mt2" (click)="clearCache()">Clear cache</button>
+      </div>
+    </div>
+  </div>
+</ion-content>

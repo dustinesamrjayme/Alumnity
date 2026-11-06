@@ -1,0 +1,27 @@
+<!-- attendees-list.page.html -->
+<ion-content>
+  <div class="main admin-page">
+    <div class="eyebrow">Organizer workspace</div>
+    <h1 class="title">Attendees</h1>
+    <p class="sub">Choose an event to view its attendee list.</p>
+    <div class="search"><input placeholder="Search events" (input)="q.set($any($event.target).value)" /></div>
+
+    <div class="scan-grid">
+      @for (e of list(); track e.id; let i = $index) {
+        <div class="card">
+          <div class="row">
+            <div class="mini" [class.green]="(e.id | eventTheme) === 'green'">PLV</div>
+            <div class="grow">
+              <h2 class="event-title" style="font-size:17px">{{ e.name }}</h2>
+              <p class="small">{{ e.event_date | dateLabel }} · {{ e.status }}</p>
+            </div>
+          </div>
+          <a class="btn full mt2" [class.primary]="i === 0" [class.outline]="i !== 0"
+             [routerLink]="['/admin/attendees', e.id]">View attendees</a>
+        </div>
+      } @empty {
+        <div class="empty">No events match your search.</div>
+      }
+    </div>
+  </div>
+</ion-content>

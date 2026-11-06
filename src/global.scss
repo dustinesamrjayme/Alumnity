@@ -33,7 +33,7 @@
   --line:   #D6E0EC;
   --yellow: #F2C94C;
   --red:    #C94343;
-  --r:      20px;
+  --r:      9px;
 }
 
 
@@ -263,6 +263,7 @@ ion-header ion-toolbar.plv-top {
   align-items: center;
   justify-content: space-between;
   padding: 20px 20px 15px;
+
 }
 
 .brand {
@@ -343,7 +344,7 @@ ion-header ion-toolbar.plv-top {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border-radius: 100px;
+  border-radius: 20px;
   padding: 5px 10px;
   font-size: 11px;
   font-weight: 700;
@@ -379,7 +380,7 @@ ion-header ion-toolbar.plv-top {
 .card {
   background: #fff;
   border: 1px solid #e8edf4;
-  border-radius: 22px;
+  border-radius: 7px;
   padding: 17px;
   margin-bottom: 13px;
   box-shadow: 0 8px 22px #14284b0a;
@@ -687,12 +688,8 @@ ion-app {
   flex-direction: column;
   justify-content: space-between;
   min-height: 100vh;
-  width: 30%;
-  margin: 0 auto;
-}
-
-ion-app:has(.dash-page) {
   width: 100%;
+  margin: 0 auto;
 }
 
 /* Desktop phone frame (disabled)
@@ -710,3 +707,13 @@ ion-app:has(.dash-page) {
   }
 }
 */
+
+button, .btn { border-radius: var(--r); }
+input, select, textarea { border-radius: var(--r); }
+
+.card { border-radius: var(--r); }
+.stat { border-radius: var(--r); }
+.mini { border-radius: var(--r); }
+.form { border-radius: 12px; }        /* form panel stays softer */
+.ticket { border-radius: 12px; }      /* tickets stay softer */
+.notice { border-radius: var(--r); }

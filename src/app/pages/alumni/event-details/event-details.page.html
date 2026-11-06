@@ -1,0 +1,60 @@
+<ion-content>
+  <div class="main">
+    <a class="back" routerLink="/tabs/events">← Back to events</a>
+
+    @if (loading()) {
+      <div class="empty">Loading…</div>
+    } @else {
+      @if (ev(); as e) {
+        <div class="event-cover"
+             [class.green]="(e.id | eventTheme) === 'green'"
+             [class.sky]="(e.id | eventTheme) === 'sky'"
+             style="height:125px;border-radius:var(--r)">
+          <span class="pill">{{ e.event_date | dateLabel }}</span>
+        </div>
+        <div class="eyebrow" style="margin-top:18px">
+          {{ e.status === 'listed' ? 'Open for registration' : 'Registration closed' }}
+        </div>
+        <h1 class="title">{{ e.name }}</h1>
+        <p class="sub">{{ e.description }}</p>
+        <div class="card">
+          <div class="listrow row">
+            <span class="mini">▦</span>
+            <div><h3>{{ e.event_date | longDate }}</h3><p>{{ e.event_date | timeLabel }} onwards</p></div>
+          </div>
+          <div class="listrow row">
+            <span class="mini green">⌖</span>
+            <div><h3>{{ e.venue }}</h3><p>Pamantasan ng Lungsod ng Valenzuela</p></div>
+          </div>
+          <div class="listrow row">
+            <span class="mini">₱</span>
+            <div>
+              <h3>{{ (e.price ?? 0) > 0 ? (e.price | feeLabel) + ' per attendee' : 'Free admission' }}</h3>
+              <p>{{ (e.price ?? 0) > 0 ? 'Pay at the event · No online payment' : 'No payment needed' }}</p>
+            </div>
+          </div>
+        </div>
+
+        @if (availability(); as a) {
+          <div class="row between">
+            <span class="small">{{ a.available == null ? 'Unlimited slots' : a.available + ' slots remaining' }}</span>
+            <span class="small">Capacity: {{ a.capacity ?? 'Unlimited' }}</span>
+          </div>
+          <div class="progress" style="margin:8px 0 20px"><span [style.width.%]="fillPercent()"></span></div>
+        }
+
+        @if (existing(); as x) {
+          <a class="btn success full" [routerLink]="['/tabs/tickets', x.id]">You're registered · View ticket</a>
+        } @else if (e.status !== 'listed') {
+          <button class="btn outline full" disabled>Registration closed</button>
+        } @else if (availability()?.available === 0) {
+          <button class="btn outline full" disabled>Fully booked</button>
+        } @else {
+          <a class="btn primary full" [routerLink]="['/tabs/events', e.id, 'register']">Register</a>
+        }
+      } @else {
+        <div class="empty">We couldn't find that event.</div>
+      }
+    }
+  </div>
+</ion-content>

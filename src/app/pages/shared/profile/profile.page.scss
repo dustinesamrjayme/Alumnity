@@ -1,0 +1,15 @@
+// Shared profile page — used by alumni, admin and volunteer.
+:host { display: block; }
+
+.main { padding: 9px 20px 26px; max-width: 720px; margin: 0 auto; }
+
+.avatar {
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--sky);
+  color: var(--blue);
+  font-weight: 800;
+}

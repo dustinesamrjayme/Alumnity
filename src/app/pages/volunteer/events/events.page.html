@@ -1,28 +1,37 @@
-<app-header />
+<!-- events.page.html -->
 <ion-content>
   <div class="main">
-    <div class="eyebrow">Alumni community</div>
+    <div class="eyebrow">Event staff</div>
     <h1 class="title">Events</h1>
-    <p class="sub">{{ store.openEvents().length }} open for registration</p>
-    @for (e of store.openEvents(); track e.id) {
+    <p class="sub">Pick an event to scan attendees or view the check-in list.</p>
+    <div class="search">
+      <input placeholder="Search events" (input)="q.set($any($event.target).value)" />
+    </div>
+
+    @for (e of list(); track e.id) {
       <article class="card event-card">
-        <div class="event-cover" [class.green]="e.theme === 'green'" [class.sky]="e.theme === 'sky'">
-          <span class="pill" [class.green]="e.theme === 'green'">{{ store.dateLabel(e) }}</span>
+        <div class="event-cover"
+             [class.green]="(e.id | eventTheme) === 'green'"
+             [class.sky]="(e.id | eventTheme) === 'sky'">
+          <span class="pill" [class.green]="(e.id | eventTheme) === 'green'">
+            {{ e.event_date | dateLabel }}
+          </span>
         </div>
         <div class="event-content">
-          <h2 class="event-title">{{ e.title }}</h2>
+          <h2 class="event-title">{{ e.name }}</h2>
           <div class="event-meta">
             <span>⌖ {{ e.venue }}</span>
-            <span>{{ store.slotsLeft(e) === 0 ? 'Fully booked' : store.slotsLeft(e) + ' slots left' }}</span>
+            <span>{{ e.status === 'listed' ? 'Open' : 'Closed' }}</span>
+            <span>{{ e.price | feeLabel }}</span>
           </div>
           <div class="event-bottom">
-            <span class="price">{{ store.feeLabel(e) }}</span>
-            <a class="btn primary" [routerLink]="['/tabs/events', e.id]">View event</a>
+            <a class="btn primary grow" [routerLink]="['/volunteer/scanner', e.id]">Scan</a>
+            <a class="btn outline grow" [routerLink]="['/volunteer/attendees', e.id]">Attendees</a>
           </div>
         </div>
       </article>
     } @empty {
-      <div class="empty">No events are open for registration right now.</div>
+      <div class="empty">No events to scan.</div>
     }
   </div>
 </ion-content>

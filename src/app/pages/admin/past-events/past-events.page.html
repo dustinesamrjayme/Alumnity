@@ -1,4 +1,4 @@
-<app-header />
+<!-- past-events.page.html -->
 <ion-content>
   <div class="main past-page">
     <a class="back" routerLink="/admin/events">← Manage events</a>
@@ -7,30 +7,26 @@
     <p class="sub">Closed events and attendance summaries.</p>
 
     <div class="past-grid">
-      @for (e of store.pastEvents; track e.id) {
+      @for (r of rows(); track r.id) {
         <div class="card chart">
           <div class="row between top">
             <div class="meta">
-              <h2 class="event-title">{{ e.title }}</h2>
-              <p class="small">{{ e.dateLabel }} · {{ e.venue }}</p>
+              <h2 class="event-title">{{ r.name }}</h2>
+              <p class="small">{{ r.event_date | dateLabel }} · {{ r.venue }}</p>
             </div>
             <span class="pill pf">Closed</span>
           </div>
-
           <div class="stats">
-            <div><span class="small">Registered</span><strong>{{ e.registered }}</strong></div>
-            <div><span class="small">Checked in</span><strong>{{ e.checkedIn }}</strong></div>
+            <div><span class="small">Registered</span><strong>{{ r.registered }}</strong></div>
+            <div><span class="small">Checked in</span><strong>{{ r.checked_in }}</strong></div>
           </div>
-
           <div class="bar" role="img"
-               [attr.aria-label]="e.checkedIn + ' of ' + e.registered + ' registrants checked in'">
-            <i [style.width.%]="e.registered ? (e.checkedIn / e.registered) * 100 : 0"></i>
+               [attr.aria-label]="r.checked_in + ' of ' + r.registered + ' registrants checked in'">
+            <i [style.width.%]="r.fillPct"></i>
           </div>
         </div>
       } @empty {
-        <div class="card empty">
-          <p class="small">No past events yet.</p>
-        </div>
+        <div class="card empty"><p class="small">No past events yet.</p></div>
       }
     </div>
   </div>

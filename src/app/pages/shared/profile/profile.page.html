@@ -1,0 +1,44 @@
+<!-- profile.page.html -->
+<ion-content>
+  <div class="main">
+    <div class="eyebrow">Your account</div>
+    <h1 class="title">Profile</h1>
+    <p class="sub">Manage your contact and graduation details.</p>
+
+    <div class="card center">
+      <div class="avatar" style="margin:auto;width:64px;height:64px;font-size:20px">
+        {{ auth.currentUser()?.first_name?.[0] }}{{ auth.currentUser()?.last_name?.[0] }}
+      </div>
+      <h2 style="font:800 20px Manrope;margin:12px 0 3px">
+        {{ auth.currentUser()?.first_name }} {{ auth.currentUser()?.last_name }}
+      </h2>
+      <p class="small">{{ auth.currentUser()?.role | titlecase }}</p>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field"><label for="first_name">First name</label><input id="first_name" formControlName="first_name" /></div>
+      <div class="field"><label for="last_name">Last name</label><input id="last_name" formControlName="last_name" /></div>
+      <div class="field"><label for="username">Username</label><input id="username" formControlName="username" /></div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" formControlName="email" /></div>
+      <div class="field"><label for="phone">Phone</label><input id="phone" formControlName="phone" /></div>
+      <div class="field">
+        <label for="department">Department</label>
+        <select id="department" formControlName="department">
+          @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
+        </select>
+      </div>
+      <div class="field">
+        <label for="program">Program</label>
+        <select id="program" formControlName="program">
+          @for (p of programs; track p) { <option [value]="p">{{ p }}</option> }
+        </select>
+      </div>
+      <div class="field"><label for="batch">Graduation year</label><input id="batch" formControlName="batch" /></div>
+      <button type="submit" class="btn primary full" [disabled]="busy()">
+        {{ busy() ? 'Saving…' : 'Save changes' }}
+      </button>
+    </form>
+
+    <button class="btn outline full mt" (click)="logout()">Log out</button>
+  </div>
+</ion-content>
