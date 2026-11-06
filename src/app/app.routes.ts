@@ -56,5 +56,16 @@ export const routes: Routes = [
       },
     ],
   },
+
+  {
+    path: 'volunteer', loadComponent: shell, data: { kind: 'volunteer' }, canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'scanner', pathMatch: 'full' },
+      { path: 'scanner', loadComponent: () => import('./pages/volunteer/scanner/scanner.page').then((m) => m.VolunteerScannerPage) },
+      { path: 'profile', loadComponent: () => import('./pages/volunteer/profile/profile.page').then((m) => m.VolunteerProfilePage) },
+      { path: 'events', loadComponent: () => import('./pages/volunteer/events/events.page').then((m) => m.VolunteerEventsPage) },
+    ],
+  },
+
   { path: '**', redirectTo: 'login' },
 ];
