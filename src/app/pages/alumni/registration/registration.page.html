@@ -1,0 +1,51 @@
+<ion-content>
+  <div class="main">
+    <a class="back" [routerLink]="['/tabs/events', id]">← Back to event</a>
+
+    @if (loading()) {
+      <div class="empty">Loading…</div>
+    } @else {
+      @if (ev(); as e) {
+        <div class="eyebrow">{{ e.name }}</div>
+        <h1 class="title">Confirm your registration</h1>
+        <p class="sub">We'll reserve your slot using the profile details on file.</p>
+
+        <div class="card">
+          @if (auth.currentUser(); as u) {
+            <div class="listrow row between"><span class="small">Name</span><strong>{{ u.first_name }} {{ u.last_name }}</strong></div>
+            <div class="listrow row between"><span class="small">Email</span><strong>{{ u.email }}</strong></div>
+            <div class="listrow row between"><span class="small">Phone</span><strong>{{ u.phone || '—' }}</strong></div>
+            <div class="listrow row between"><span class="small">Department</span><strong>{{ u.department || '—' }}</strong></div>
+            <div class="listrow row between"><span class="small">Program</span><strong>{{ u.program || '—' }}</strong></div>
+            <div class="listrow row between"><span class="small">Batch</span><strong>{{ u.batch || '—' }}</strong></div>
+          }
+          <a class="link" routerLink="/tabs/profile">Edit profile</a>
+        </div>
+
+        <div class="notice">
+          @if ((e.price ?? 0) === 0) {
+            This event is free. No payment is needed.
+          } @else {
+            Pay {{ e.price | feeLabel }} at the event. No online payment is needed.
+          }
+        </div>
+
+        @if (existing(); as x) {
+          <a class="btn success full" [routerLink]="['/tabs/tickets', x.id]">You're registered · View ticket</a>
+        } @else if (!profileComplete()) {
+          <div class="notice">Complete your profile to register.</div>
+          <a class="btn primary full" routerLink="/tabs/profile">Complete profile</a>
+        } @else {
+          @if (error()) {
+            <div class="err" style="color:var(--red);margin-bottom:12px">{{ error() }}</div>
+          }
+          <button class="btn primary full" [disabled]="busy()" (click)="register()">
+            {{ busy() ? 'Registering…' : 'Confirm registration' }}
+          </button>
+        }
+      } @else {
+        <div class="empty">We couldn't find that event.</div>
+      }
+    }
+  </div>
+</ion-content>

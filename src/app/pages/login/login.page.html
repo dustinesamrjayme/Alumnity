@@ -1,7 +1,8 @@
+<!-- login.page.html -->
 <ion-content class="login-content" [fullscreen]="true">
   <div class="login-screen">
     <section class="login-brand" aria-label="PLV Alumni Events">
-      <img src="assets/logo.jpg"/>
+      <img src="assets/logo.jpg" alt="" />
       <h1>PLV</h1>
       <p>Alumni Events</p>
     </section>
@@ -12,20 +13,24 @@
         <div class="field">
           <label for="email">Email</label>
           <input id="email" type="email" autocomplete="email" formControlName="email" placeholder="maria.santos@plv.edu.ph" />
-          @if (submitted && form.controls.email.invalid) { <div class="err">Enter a valid email address.</div> }
+          @if (submitted() && form.controls.email.invalid) { <div class="err">Enter a valid email address.</div> }
         </div>
         <div class="field">
           <label for="password">Password</label>
           <input id="password" type="password" autocomplete="current-password" formControlName="password" placeholder="••••••••" />
-          @if (submitted && form.controls.password.invalid) { <div class="err">Enter your password.</div> }
+          @if (submitted() && form.controls.password.invalid) { <div class="err">Enter your password.</div> }
         </div>
-        <button type="submit" class="btn primary full">Log in</button>
-        <div class="login-links">
-          or <a (click)="store.toast('Magic link sent (demo)')">email me a magic link</a><br /><br />
-          New here? <a (click)="store.toast('Sign-up is a demo. Log in with any email and password.')">Sign up</a>
-        </div>
+        @if (error()) {
+          <div class="err" style="color:var(--red);margin-bottom:12px" role="alert">{{ error() }}</div>
+        }
+        <button type="submit" class="btn primary full" [disabled]="busy()">
+          {{ busy() ? 'Signing in…' : 'Log in' }}
+        </button>
+        <div class="login-links">New here? <a routerLink="/signup">Sign up</a></div>
       </form>
-      <p class="demo-note">Demo prototype · Authentication not connected</p>
+      @if (isMock) {
+       <p class="demo-note">Demo · maria.santos&#64;plv.edu.ph / demo1234</p>
+      }
     </section>
   </div>
 </ion-content>

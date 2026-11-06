@@ -1,0 +1,50 @@
+<!-- attendees.page.html -->
+<ion-content>
+  <div class="main">
+    <a class="back" routerLink="/volunteer/events">← Events</a>
+    @if (ev(); as e) {
+      <div class="eyebrow">{{ e.name }}</div>
+      <h1 class="title">Attendees</h1>
+      <p class="sub">{{ e.event_date | dateLabel }} · {{ e.venue }}</p>
+
+      <div class="stat-grid">
+        <div class="stat"><span>Total</span><strong>{{ counts().total }}</strong></div>
+        <div class="stat"><span>Checked in</span><strong>{{ counts().in }}</strong></div>
+        <div class="stat"><span>Not checked in</span><strong>{{ counts().out }}</strong></div>
+        <div class="stat"><span>Cancelled</span><strong>{{ counts().cancelled }}</strong></div>
+      </div>
+
+      <div class="row" style="margin:20px 0">
+        <button class="btn primary grow" (click)="download()">↓ Download CSV</button>
+        <button class="btn yellow grow" [disabled]="finalizing()" (click)="finalize()">
+          {{ finalizing() ? 'Finalizing…' : 'Finalize event' }}
+        </button>
+      </div>
+
+      <div class="section"><h2>Attendees</h2></div>
+      @for (a of attendees(); track a.registration_id) {
+        <div class="card">
+          <div class="row between">
+            <div>
+              <h3 style="font:800 15px Manrope;margin:0 0 5px">{{ a.first_name }} {{ a.last_name }}</h3>
+              <p class="small">{{ a.payment_status }}</p>
+            </div>
+            <span class="pill"
+                  [class.green]="a.attendee_status === 'checked_in'"
+                  [class.yellow]="a.attendee_status === 'not_checked_in'"
+                  [class.red]="a.attendee_status === 'cancelled'">
+              {{ statusLabel(a.attendee_status) }}
+            </span>
+          </div>
+          @if (a.attendee_status === 'not_checked_in') {
+            <button class="btn outline full mt2" (click)="markNoShow(a)">Mark as no-show</button>
+          }
+        </div>
+      } @empty {
+        <div class="empty">No attendees yet.</div>
+      }
+    } @else {
+      <div class="empty">Loading…</div>
+    }
+  </div>
+</ion-content>

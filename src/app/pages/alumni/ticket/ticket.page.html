@@ -1,0 +1,51 @@
+<!-- ticket.page.html -->
+<ion-content>
+  <div class="main">
+    <a class="back" routerLink="/tabs/tickets">← My tickets</a>
+    @if (ticket(); as t) {
+      <div class="ticket">
+        <div class="ticket-head">
+          <div class="row">
+            <img class="brand-logo" src="assets/logo.jpg" alt="PLV Alumni Events logo" />
+            <div>
+              <div class="eyebrow">PLV Alumni Events</div>
+              <h2>{{ t.event.name }}</h2>
+              <p class="small">
+                {{ auth.currentUser()?.first_name }} {{ auth.currentUser()?.last_name }} ·
+                {{ t.event.event_date | dateLabel }}, {{ t.event.event_date | timeLabel }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="ticket-body">
+          <div class="center">
+            <span class="pill"
+                  [class.green]="t.attendee_status === 'not_checked_in'"
+                  [class.yellow]="t.attendee_status === 'checked_in'"
+                  [class.red]="t.attendee_status === 'cancelled'">
+              {{ t.attendee_status === 'checked_in' ? 'Already used'
+                 : t.attendee_status === 'cancelled' ? 'Cancelled'
+                 : 'Valid ticket' }}
+            </span>
+          </div>
+          <div class="perforation"></div>
+          <div class="qr">@if (qr()) { <img [src]="qr()" alt="Ticket QR code" /> }</div>
+          <div class="center small" style="margin-top:12px;font-weight:700;letter-spacing:1px;color:var(--navy)">
+            PLV-{{ t.id.toString().padStart(10, '0') }}
+        </div>
+          <div class="notice" style="text-align:center">
+            {{ (t.event.price ?? 0) > 0 ? 'Pay ' + (t.event.price | feeLabel) + ' at the event' : 'Free admission' }}
+          </div>
+          <div class="ticket-info"><span>Venue</span><strong>{{ t.event.venue }}</strong></div>
+          <div class="ticket-info">
+            <span>Check-in status</span>
+            <strong>{{ t.attendee_status === 'checked_in' ? 'Checked in' : 'Not checked-in' }}</strong>
+          </div>
+        </div>
+      </div>
+      <button class="btn success full mt2" (click)="download()">Download PNG</button>
+    } @else {
+      <div class="empty">We couldn't find that ticket.</div>
+    }
+  </div>
+</ion-content>
