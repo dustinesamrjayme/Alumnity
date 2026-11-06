@@ -1,4 +1,4 @@
-<app-header />
+<!-- admin-events.page.html -->
 <ion-content>
   <div class="main admin-page">
     <div class="page-head">
@@ -10,21 +10,29 @@
       <a class="btn primary full" routerLink="/admin/events/new">＋ Create event</a>
     </div>
 
-    <div class="section"><h2>All events</h2><span class="pill green">{{ store.openEvents().length }} open</span></div>
+    <div class="section">
+      <h2>All events</h2>
+      <span class="pill green">{{ events().length }} total</span>
+    </div>
 
     <div class="event-grid">
-      @for (e of store.events(); track e.id) {
+      @for (e of events(); track e.id) {
         <div class="card">
           <div class="row between">
-            <h2 class="event-title" style="margin:0 0 6px">{{ e.title }}</h2>
-            <span class="pill" [class.green]="e.open">{{ e.open ? 'Open' : 'Closed' }}</span>
+            <h2 class="event-title" style="margin:0 0 6px">{{ e.name }}</h2>
+            <span class="pill" [class.green]="e.status === 'listed'">
+              {{ e.status === 'listed' ? 'Open' : 'Closed' }}
+            </span>
           </div>
-          <p class="small">{{ store.dateLabel(e) }} · {{ e.venue }} · {{ store.feeLabel(e) }}</p>
+          <p class="small">{{ e.event_date | dateLabel }} · {{ e.venue }} · {{ e.price | feeLabel }}</p>
           <div class="row mt2">
             <a class="btn outline grow" [routerLink]="['/admin/events', e.id, 'edit']">Edit</a>
-            <a class="btn success grow" [routerLink]="['/admin/checkin', e.id]">Attendees</a>
+            <a class="btn success grow" [routerLink]="['/admin/attendees', e.id]">Attendees</a>
           </div>
-          <button class="btn outline full mt" (click)="toggle(e.id, e.open)">{{ e.open ? 'Close registration' : 'Reopen registration' }}</button>
+          <button class="btn outline full mt" (click)="toggle(e)">
+            {{ e.status === 'listed' ? 'Close registration' : 'Reopen registration' }}
+          </button>
+          <button class="btn yellow full mt" (click)="finalize(e)">Finalize event</button>
         </div>
       }
     </div>

@@ -1,0 +1,13 @@
+<!-- events.page.html -->
+<ion-content>
+  <div class="main">
+    <div class="eyebrow">Alumni community</div>
+    <h1 class="title">Events</h1>
+    <p class="sub">{{ events().length }} open for registration</p>
+    @for (e of events(); track e.id) {
+      <app-event-card [event]="e" />
+    } @empty {
+      <div class="empty">No events are open for registration right now.</div>
+    }
+  </div>
+</ion-content>
