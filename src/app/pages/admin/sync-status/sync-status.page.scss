@@ -1,1 +1,100 @@
-// Styles for sync-status page
+// Sync status page. Web layout, same tokens as the dashboard.
+:host {
+  --d-ink: var(--ink, #14284b);
+  --d-blue: var(--blue, #2457a6);
+  --d-green: var(--green, #1f7a58);
+  --d-tint: var(--tint, #dce8f5);
+  --d-line: var(--line, #d5dee9);
+  --d-mute: var(--mute, #5c6b85);
+}
+
+.main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--d-blue);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover { text-decoration: underline; }
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+
+  strong { font-size: 28px; line-height: 1.2; }
+  .stat-text { font-size: 17px; }
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  .card { margin: 0; min-width: 0; }
+}
+
+.mini {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  background: var(--d-tint);
+  color: var(--d-blue);
+
+  &.green { background: var(--d-green); color: #fff; }
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--paper, #fcfdfe);
+  border: 1px solid var(--d-line);
+  color: var(--d-ink);
+
+  &.green { background: var(--d-green); border-color: transparent; color: #fff; }
+  &.yellow { background: #fff1c6; border-color: transparent; color: #785b00; }
+}
+
+.notice {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--d-tint);
+  color: var(--d-ink);
+  font-size: 13px;
+}
+
+@media (max-width: 1000px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .action-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .main { padding: 16px; }
+  .stat-grid { grid-template-columns: 1fr; }
+}

@@ -1,1 +1,50 @@
-// Styles for admin-events page
+// ---------- Web layout (CSS only) ----------
+.main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+// Title on the left, Create button on the right
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .sub { margin-bottom: 0; }
+  .btn.full { width: auto; flex: none; padding-inline: 22px; }
+}
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+
+  .card {
+    margin-bottom: 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+
+    .small { margin: 0 0 4px; }
+
+    .row.mt2 {
+      margin-top: 18px;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    button.mt { margin-top: auto; }
+  }
+}
+
+.link { display: inline-block; margin-top: 24px; }
+
+@media (max-width: 560px) {
+  .main { padding: 16px; }
+  .page-head .btn.full { width: 100%; }
+  .event-grid { grid-template-columns: 1fr; }
+}
