@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { EventsService } from '../events.service';
 import {
   EventAvailability, EventItem, EventUpdate, EventWithAvailability, NewEvent,

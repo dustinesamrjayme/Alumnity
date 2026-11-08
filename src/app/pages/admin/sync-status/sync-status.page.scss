@@ -15,18 +15,6 @@
   padding: 32px;
 }
 
-.back {
-  display: inline-block;
-  margin-bottom: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--d-blue);
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover { text-decoration: underline; }
-}
-
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

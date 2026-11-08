@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { AdminService } from '../admin.service';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
 

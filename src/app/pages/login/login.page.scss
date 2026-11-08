@@ -130,3 +130,23 @@ ion-content.login-content {
   color: #8491a5;
   margin-top: 22px;
 }
+
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 40px; /* Make room for the icon */
+  }
+
+  ion-icon {
+    position: absolute;
+    right: 14px;
+    font-size: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    z-index: 10;
+  }
+}

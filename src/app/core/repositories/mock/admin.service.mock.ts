@@ -40,7 +40,6 @@ export class MockAdminService extends AdminService {
       .filter((u) =>
         u.first_name.toLowerCase().includes(t)
         || u.last_name.toLowerCase().includes(t)
-        || u.username.toLowerCase().includes(t)
         || u.email.toLowerCase().includes(t))
       .slice(0, 25);
   }
