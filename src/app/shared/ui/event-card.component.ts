@@ -9,11 +9,18 @@ import { DateLabelPipe, FeeLabelPipe, EventThemePipe } from '../pipes/format.pip
   imports: [RouterLink, DateLabelPipe, FeeLabelPipe, EventThemePipe],
   template: `
     <article class="card event-card">
-      <div class="event-cover"
+            <div class="event-cover"
+           [class.has-image]="event().banner_url"
            [class.green]="(event().id | eventTheme) === 'green'"
            [class.sky]="(event().id | eventTheme) === 'sky'"
            [attr.aria-label]="event().name">
-        <span class="pill"
+        
+        @if (event().banner_url) {
+          <img [src]="event().banner_url" alt="" 
+               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" />
+        }
+
+        <span class="pill" style="position: relative; z-index: 1;"
               [class.green]="(event().id | eventTheme) === 'green'">
           {{ event().event_date | dateLabel }}
         </span>

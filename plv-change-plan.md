@@ -1,4 +1,4 @@
-# PLV Alumni Events: Change Plan and Ranked Fixes
+# Alumnity: Change Plan and Ranked Fixes
 
 2026-11-06
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PLV Alumni Events — design tokens and shared UI
+   Alumnity - PLV Alumni Event Management System — design tokens and shared UI
    Ported from the HTML prototype's styles.css
 
    Contents
@@ -20,7 +20,16 @@
    ========================================================================== */
 
 /* 1. Tokens
-   ========================================================================== */
+   ===================
+   
+   ======================================================= */
+@import '@fontsource/dm-sans/400.css';
+@import '@fontsource/dm-sans/500.css';
+@import '@fontsource/dm-sans/700.css';
+@import '@fontsource/manrope/500.css';
+@import '@fontsource/manrope/600.css';
+@import '@fontsource/manrope/700.css';
+@import '@fontsource/manrope/800.css';
 
 :root {
   --navy:   #14284B;
@@ -230,7 +239,7 @@ label {
 
 .link {
   color: var(--blue);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -238,8 +247,13 @@ label {
   display: inline-flex;
   color: var(--blue);
   font-weight: 800;
-  font-size: 13px;
-  margin: 0 0 18px;
+  font-size: 15px;
+  margin: 0 0 20px;
+}
+
+
+.back:hover {
+  text-decoration: underline;
 }
 
 

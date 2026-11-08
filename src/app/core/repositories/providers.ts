@@ -1,5 +1,5 @@
 import { Provider } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 import { AuthService } from './auth.service';
 import { EventsService } from './events.service';

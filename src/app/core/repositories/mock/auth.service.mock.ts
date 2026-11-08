@@ -29,13 +29,12 @@ async signUp(input: SignUpInput): Promise<void> {
   await this.db.ensureLoaded();
   const taken = this.db.state().users.some(
     (u) => u.email.toLowerCase() === input.email.toLowerCase()
-      || u.username.toLowerCase() === input.username.toLowerCase(),
   );
-  if (taken) throw new Error('Email or username already in use.');
+  if (taken) throw new Error('Email already in use.');
   const user: AppUser = {
     id: 'u-' + Math.random().toString(36).slice(2, 10),
     first_name: input.first_name, last_name: input.last_name,
-    email: input.email, username: input.username, phone: input.phone,
+    email: input.email, phone: input.phone,
     department: input.department, program: input.program, batch: input.batch,
     role: 'alumni', created_at: new Date().toISOString(),
   };
@@ -64,5 +63,9 @@ async signUp(input: SignUpInput): Promise<void> {
       return { ...s, users };
     });
     return updated!;
+  }
+
+  async resendConfirmationEmail(email: string): Promise<void> {
+    console.log(`Mock: Resent confirmation to ${email}`);
   }
 }
