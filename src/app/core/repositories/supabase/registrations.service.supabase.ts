@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { RegistrationsService } from '../registrations.service';
 import { Attendee, MyTicket, Registration } from '../../models';
 

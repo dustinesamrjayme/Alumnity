@@ -31,7 +31,7 @@ export class RegistrationPage {
 
   profileComplete = computed(() => {
     const u = this.auth.currentUser();
-    return !!(u && u.first_name && u.last_name && u.username && u.phone && u.department && u.program && u.batch);
+    return !!(u && u.first_name && u.last_name && u.phone && u.department && u.program && u.batch);
   });
 
   constructor() { void this.load(); }

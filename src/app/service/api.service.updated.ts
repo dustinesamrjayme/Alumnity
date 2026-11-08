@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import QRCode from 'qrcode';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import {
   AppUser,
   Attendee,

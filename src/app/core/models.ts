@@ -13,36 +13,35 @@ export interface AppUser {
   first_name: string;
   last_name: string;
   email: string;
-  username: string;
   phone: string;
   department: Department;
   program: Program;
-  batch: string;
+  batch: number;
   role: UserRole;
   created_at: string;
 }
 
 export const USER_COLUMNS =
-  'id, first_name, last_name, email, username, phone, department, program, batch, role, created_at';
+  'id, first_name, last_name, email, phone, department, program, batch, role, created_at';
 
-export interface SignInInput { email: string; password: string; }
+
 
 export interface SignUpInput {
   email: string;
   password: string;
   first_name: string;
   last_name: string;
-  username: string;
   phone: string;
   department: Department;
   program: Program;
-  batch: string;
+  batch: number;
 }
 
 export type ProfileUpdate = Partial<
-  Pick<AppUser, 'username' | 'first_name' | 'last_name' | 'phone' | 'department' | 'program' | 'batch'>
+  Pick<AppUser, 'first_name' | 'last_name' | 'phone' | 'department' | 'program' | 'batch'>
 >;
 
+export interface SignInInput { email: string; password: string; }
 // ---------- Events ----------
 export interface EventItem {
   id: number;

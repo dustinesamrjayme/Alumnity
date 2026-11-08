@@ -133,7 +133,8 @@ language plpgsql security definer set search_path = public as $$
 declare
     v_cancelled integer;
 begin
-    if coalesce(auth_role(), '') not in ('admin', 'volunteer') then
+    -- Allow system jobs (pg_cron) where auth.uid() is null
+    if auth.uid() is not null and coalesce(auth_role(), '') not in ('admin', 'volunteer') then
         raise exception 'not allowed' using errcode = '42501';
     end if;
 
@@ -160,6 +161,11 @@ declare
     v_event  record;
     v_total  integer := 0;
 begin
+    -- Allow system jobs (pg_cron) where auth.uid() is null
+    if auth.uid() is not null and coalesce(auth_role(), '') not in ('admin', 'volunteer') then
+        raise exception 'not allowed' using errcode = '42501';
+    end if;
+
     for v_event in
         select id from events
          where event_date < now() - (p_grace_hours * interval '1 hour')
@@ -173,7 +179,6 @@ begin
     return v_total;
 end;
 $$;
-
 -- ---------------------------------------------------------------------
 -- 5. Drop the redundant password column
 -- ---------------------------------------------------------------------

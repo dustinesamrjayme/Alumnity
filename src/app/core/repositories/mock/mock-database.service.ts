@@ -25,17 +25,17 @@ function seed(): MockState {
   const now = new Date().toISOString();
   const users: AppUser[] = [
     { id: 'u-maria', first_name: 'Maria', last_name: 'Santos',
-      email: 'test@plv', username: 'maria.santos',
+      email: 'test@plv', 
       phone: '09171234567', department: 'CEIT', program: 'BSIT',
-      batch: '2016', role: 'alumni', created_at: now },
+      batch: 2016, role: 'alumni', created_at: now },
     { id: 'u-admin', first_name: 'Admin', last_name: 'PLV',
-      email: 'admin@plv', username: 'admin',
+      email: 'admin@plv', 
       phone: '09170000001', department: 'CEIT', program: 'BSIT',
-      batch: '2010', role: 'admin', created_at: now },
+      batch: 2010, role: 'admin', created_at: now },
     { id: 'u-volunteer', first_name: 'Volunteer', last_name: 'PLV',
-      email: 'volunteer@plv', username: 'volunteer',
+      email: 'volunteer@plv',
       phone: '09170000002', department: 'CEIT', program: 'BSIT',
-      batch: '2020', role: 'volunteer', created_at: now },
+      batch: 2020, role: 'volunteer', created_at: now },
   ];
 
   const events: EventItem[] = [

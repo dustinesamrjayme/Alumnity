@@ -6,9 +6,9 @@
       <div class="ticket">
         <div class="ticket-head">
           <div class="row">
-            <img class="brand-logo" src="assets/logo.jpg" alt="PLV Alumni Events logo" />
+            <img class="brand-logo" src="assets/logo.jpg" alt="Alumnity - PLV Alumni Event Management System logo" />
             <div>
-              <div class="eyebrow">PLV Alumni Events</div>
+              <div class="eyebrow">Alumnity - PLV Alumni Event Management System</div>
               <h2>{{ t.event.name }}</h2>
               <p class="small">
                 {{ auth.currentUser()?.first_name }} {{ auth.currentUser()?.last_name }} ·
@@ -31,7 +31,7 @@
           <div class="perforation"></div>
           <div class="qr">@if (qr()) { <img [src]="qr()" alt="Ticket QR code" /> }</div>
           <div class="center small" style="margin-top:12px;font-weight:700;letter-spacing:1px;color:var(--navy)">
-            PLV-{{ t.id.toString().padStart(10, '0') }}
+            PLV-{{ t.id.toString().padStart(4, '0') }}
         </div>
           <div class="notice" style="text-align:center">
             {{ (t.event.price ?? 0) > 0 ? 'Pay ' + (t.event.price | feeLabel) + ' at the event' : 'Free admission' }}

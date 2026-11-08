@@ -17,17 +17,6 @@
   padding: 32px;
 }
 
-.back {
-  display: inline-block;
-  margin-bottom: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--d-blue);
-  text-decoration: none;
-
-  &:hover { text-decoration: underline; }
-}
-
 .dash-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

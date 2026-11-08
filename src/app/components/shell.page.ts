@@ -41,7 +41,7 @@ const VOLUNTEER: TabDef[] = [
           <div class="top">
             <a class="brand" [routerLink]="homeRoute()">
               <img class="brand-logo" src="assets/logo.jpg" alt="" />
-              <span>PLV<br /><span class="brand-sub">Alumni Events</span></span>
+              <span>Alumnity<br /><span class="brand-sub">PLV Alumni Event Management System</span></span>
             </a>
             <a class="avatar" [routerLink]="profileRoute()" aria-label="Profile">{{ initials() }}</a>
           </div>
