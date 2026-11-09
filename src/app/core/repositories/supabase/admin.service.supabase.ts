@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../../environments/environment';
-import { AdminService } from '../admin.service';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
+import { AdminService, AlumniSummary } from '../admin.service';
 
 @Injectable()
 export class SupabaseAdminService extends AdminService {
@@ -42,5 +42,9 @@ export class SupabaseAdminService extends AdminService {
       await this.sb.rpc('finalize_past_events', { p_grace_hours: graceHours }),
     );
     return typeof res === 'number' ? res : 0;
+  }
+
+  async alumniSummary(): Promise<AlumniSummary> {
+    return this.unwrap(await this.sb.rpc('get_alumni_summary'));
   }
 }

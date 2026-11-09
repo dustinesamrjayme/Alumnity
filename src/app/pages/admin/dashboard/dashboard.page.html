@@ -1,147 +1,253 @@
 <ion-content>
   <div class="main dash-page">
-    <div class="eyebrow">Organizer workspace</div>
-    <h1 class="title">Dashboard</h1>
-    <p class="sub">A clear overview of alumni events and entry activity.</p>
 
-    <div class="stat-grid">
-      <div class="stat">
-        <span>Registrations</span>
-        <strong>{{ registrations() }}</strong>
-        <small class="small">Across events</small>
+    <!-- Header -->
+    <div class="head">
+      <div>
+        <div class="eyebrow">Organizer workspace</div>
+        <h1 class="title">Dashboard</h1>
+        <p class="sub">Alumni events, attendance and accounts at a glance.</p>
       </div>
-      <div class="stat">
-        <span>Checked-in</span>
-        <strong>{{ checkedIn() }}</strong>
-        <small class="small">All events</small>
-      </div>
-      <div class="stat">
-        <span>Open events</span>
-        <strong>{{ openCount() }}</strong>
-        <small class="small">Registration live</small>
-      </div>
-      <div class="stat">
-        <span>Cancelled</span>
-        <strong>{{ cancelled() }}</strong>
-        <small class="small">All events</small>
+      <div class="head-actions">
+        <button class="btn soft" (click)="load()" [disabled]="loading()">
+          {{ loading() ? 'Refreshing…' : 'Refresh' }}
+        </button>
+        <a class="btn primary" routerLink="/admin/events/new">＋ Create event</a>
       </div>
     </div>
 
-    <div class="dash-grid">
-      <div class="card chart span-8">
-        <h2>Registrations by event</h2>
-        <svg viewBox="0 0 620 230" role="img"
-             [attr.aria-label]="'Registrations across ' + series().length + ' events, total ' + registrations()">
-          <g class="gl">
-            @for (t of yTicks(); track t.value) {
-              <line [attr.x1]="40" [attr.x2]="600" [attr.y1]="t.y" [attr.y2]="t.y" />
+    @if (error(); as msg) {
+      <div class="card notice bad">
+        <div>
+          <strong>Couldn't load the dashboard</strong>
+          <div class="small">{{ msg }}</div>
+        </div>
+        <button class="btn outline" (click)="load()">Try again</button>
+      </div>
+    }
+
+    @if (loading() && !events().length) {
+      <div class="card empty">Loading dashboard…</div>
+    } @else {
+
+      <!-- Needs attention -->
+      <section class="card attn">
+        <h2>Needs attention</h2>
+        @if (attention().length) {
+          <ul>
+            @for (a of attention(); track a.text) {
+              <li [class]="'tone-' + a.tone">
+                <span class="attn-dot"></span>
+                <span class="attn-text">{{ a.text }}</span>
+                @if (a.action === 'finalize') {
+                  <button class="link" [disabled]="finalizing()" (click)="finalizePast()">{{ a.cta }}</button>
+                } @else {
+                  <a class="link" [routerLink]="a.link">{{ a.cta }}</a>
+                }
+              </li>
             }
-          </g>
-          <g class="ax" text-anchor="end">
-            @for (t of yTicks(); track t.value) {
-              <text x="32" [attr.y]="t.y + 4">{{ t.value }}</text>
-            }
-          </g>
-          @if (series().length) {
-            <path class="ar" [attr.d]="areaPath()" />
-            <polyline class="ln" [attr.points]="linePoints()" />
-            <g>
-              @for (p of series(); track p.id) {
-                <circle class="pt" [attr.cx]="p.x" [attr.cy]="p.y" r="4" />
-              }
-            </g>
-            <g class="ax" text-anchor="middle">
-              @for (p of series(); track p.id) {
-                <text [attr.x]="p.x" y="212">{{ p.label }}</text>
-              }
-            </g>
-          }
-        </svg>
-        <div class="up">{{ registrations() }} total registrations</div>
+          </ul>
+        } @else {
+          <p class="small ok">All clear. Nothing needs your attention right now.</p>
+        }
+      </section>
+
+      <!-- Events KPIs -->
+      <div class="group-label">Events</div>
+      <div class="stat-grid">
+        <div class="stat">
+          <span>Active registrations</span>
+          <strong>{{ registrations() }}</strong>
+          <small class="small">Excludes cancelled</small>
+        </div>
+        <div class="stat">
+          <span>Check-in rate</span>
+          <strong>{{ checkedInPct() }}%</strong>
+          <small class="small">{{ checkedIn() }} of {{ registrations() }} checked in</small>
+        </div>
+        <div class="stat">
+          <span>Open events</span>
+          <strong>{{ openCount() }}</strong>
+          <small class="small">Registration live</small>
+        </div>
+        <div class="stat">
+          <span>Cancelled registrations</span>
+          <strong>{{ cancelled() }}</strong>
+          <small class="small">All events</small>
+        </div>
       </div>
 
-      <div class="card chart span-4">
-        <h2>Check-in status</h2>
-        <div class="dn">
-          <svg viewBox="0 0 140 140" role="img"
-               [attr.aria-label]="checkedIn() + ' checked in, ' + notCheckedIn() + ' not checked in'">
-            <g fill="none" stroke-width="18" transform="rotate(-90 70 70)">
-              <circle cx="70" cy="70" r="52" class="track" />
-              <circle cx="70" cy="70" r="52" class="seg-in"
-                      [attr.stroke-dasharray]="donutIn() + ' ' + circ" />
-              @if (notCheckedIn() > 0) {
-                <circle cx="70" cy="70" r="52" class="seg-out"
-                        [attr.stroke-dasharray]="donutOut() + ' ' + circ"
-                        [attr.stroke-dashoffset]="-donutIn()" />
+      <!-- Alumni KPIs -->
+      <div class="group-label">Alumni</div>
+      <div class="stat-grid two">
+        <a class="stat tap" routerLink="/admin/alumni">
+          <span>Total alumni</span>
+          <strong>{{ alumni()?.total ?? '—' }}</strong>
+          <small class="small">{{ alumni() ? 'Registered accounts' : 'Not available yet' }}</small>
+        </a>
+        <div class="stat">
+          <span>New this month</span>
+          <strong>{{ alumni()?.newThisMonth ?? '—' }}</strong>
+          <small class="small">Joined since the 1st</small>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="dash-grid">
+        <div class="card chart span-8">
+          <div class="chart-head">
+            <h2>Registrations by event</h2>
+            <div class="legend inline">
+              <div><i class="dot reg"></i>Registered</div>
+              <div><i class="dot in"></i>Checked in</div>
+            </div>
+          </div>
+
+          @if (chartBars().length) {
+            <svg viewBox="0 0 620 230" role="img"
+                 [attr.aria-label]="'Registrations across ' + chartBars().length + ' events, total ' + registrations()">
+              <g class="gl">
+                @for (t of yTicks(); track t.y) {
+                  <line [attr.x1]="40" [attr.x2]="600" [attr.y1]="t.y" [attr.y2]="t.y" />
+                }
+              </g>
+              <g class="ax" text-anchor="end">
+                @for (t of yTicks(); track t.y) {
+                  <text x="32" [attr.y]="t.y + 4">{{ t.value }}</text>
+                }
+              </g>
+              @for (b of chartBars(); track b.id) {
+                <g>
+                  <title>{{ b.full }}: {{ b.registered }} registered, {{ b.checkedIn }} checked in</title>
+                  <rect class="bar-reg" rx="3" [attr.x]="b.regX" [attr.y]="b.regY" [attr.width]="b.bw" [attr.height]="b.regH" />
+                  <rect class="bar-chk" rx="3" [attr.x]="b.chkX" [attr.y]="b.chkY" [attr.width]="b.bw" [attr.height]="b.chkH" />
+                  <text class="ax" text-anchor="middle" [attr.x]="b.cx" y="212">{{ b.label }}</text>
+                </g>
               }
-            </g>
-            <text class="num" x="70" y="72" text-anchor="middle">{{ checkedInPct() }}%</text>
-            <text class="ax" x="70" y="90" text-anchor="middle">checked in</text>
-          </svg>
-          <div class="legend">
-            <div><i class="dot in"></i>{{ checkedIn() }} checked in</div>
-            <div><i class="dot out"></i>{{ notCheckedIn() }} not checked in</div>
+            </svg>
+            @if (hiddenEvents() > 0) {
+              <div class="small">Showing the top 8 events by registrations. {{ hiddenEvents() }} more in the table below.</div>
+            }
+          } @else {
+            <div class="empty-inline">No events yet. Create one to see registrations here.</div>
+          }
+        </div>
+
+        <div class="card chart span-4">
+          <h2>Check-in status</h2>
+          <div class="dn">
+            <svg viewBox="0 0 140 140" role="img"
+                 [attr.aria-label]="checkedIn() + ' checked in, ' + notCheckedIn() + ' not checked in'">
+              <g fill="none" stroke-width="18" transform="rotate(-90 70 70)">
+                <circle cx="70" cy="70" r="52" class="track" />
+                <circle cx="70" cy="70" r="52" class="seg-in"
+                        [attr.stroke-dasharray]="donutIn() + ' ' + circ" />
+                @if (notCheckedIn() > 0) {
+                  <circle cx="70" cy="70" r="52" class="seg-out"
+                          [attr.stroke-dasharray]="donutOut() + ' ' + circ"
+                          [attr.stroke-dashoffset]="-donutIn()" />
+                }
+              </g>
+              <text class="num" x="70" y="72" text-anchor="middle">{{ checkedInPct() }}%</text>
+              <text class="ax" x="70" y="90" text-anchor="middle">checked in</text>
+            </svg>
+            <div class="legend">
+              <div><i class="dot in"></i>{{ checkedIn() }} checked in</div>
+              <div><i class="dot out"></i>{{ notCheckedIn() }} not checked in</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events table -->
+        <div class="card chart span-12">
+          <div class="chart-head">
+            <h2>Events</h2>
+            <div class="tabs" role="tablist">
+              @for (f of filters; track f.key) {
+                <button role="tab" [class.on]="filter() === f.key"
+                        [attr.aria-selected]="filter() === f.key"
+                        (click)="filter.set(f.key)">
+                  {{ f.label }} <span class="count">{{ filterCounts()[f.key] }}</span>
+                </button>
+              }
+            </div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Registered</th>
+                  <th>Checked in</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of tableRows(); track r.id) {
+                  <tr>
+                    <td><b>{{ r.name }}</b></td>
+                    <td class="mute">{{ r.date ? (r.date | date: 'MMM d, y') : '—' }}</td>
+                    <td>
+                      {{ r.registered }} / {{ r.capacity > 0 ? r.capacity : '∞' }}
+                      @if (r.capacity > 0) {
+                        <div class="bar"><i [style.width.%]="r.fill"></i></div>
+                      }
+                    </td>
+                    <td>{{ r.checkedIn }}</td>
+                    <td><span [class]="'pill ' + r.pill">{{ r.statusLabel }}</span></td>
+                    <td class="row-actions">
+                      <a class="link" [routerLink]="['/admin/attendees', r.id]">Attendees</a>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="6" class="empty-cell">No events match this filter.</td></tr>
+                }
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <div class="card chart span-5">
-        <h2>Capacity filled</h2>
-        <div class="bars">
-          @for (r of barRows(); track r.id) {
-            <div class="br">
-              <span class="br-name">{{ r.name }}</span>
-              <div class="bar"><i [style.width.%]="r.fill"></i></div>
-              <b>{{ r.registered }}</b>
+      <!-- Bottom row -->
+      <div class="dash-grid">
+        <div class="card chart span-5">
+          <h2>Quick actions</h2>
+          <div class="qa">
+            <a class="btn primary" routerLink="/admin/events/new">＋ Create event</a>
+            <button class="btn soft" (click)="exportCsv()">Export summary (CSV)</button>
+            <a class="btn soft" routerLink="/admin/attendees/sync">Sync status</a>
+            <button class="btn yellow" [disabled]="finalizing()" (click)="finalizePast()">
+              {{ finalizing() ? 'Finalizing…' : 'Finalize past events' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="card chart span-7">
+          @if (featured(); as e) {
+            <div class="chart-head">
+              <h2>Next up: {{ e.name }}</h2>
+              <a class="link" routerLink="/admin/events">Manage</a>
             </div>
+            <div class="small mute">{{ e.date ? (e.date | date: 'EEEE, MMM d, y') : 'Date not set' }}</div>
+            <div class="row between" style="margin-top:14px">
+              <span class="small">Registration progress</span>
+              <strong>{{ e.registered }} / {{ e.capacity > 0 ? e.capacity : '∞' }}</strong>
+            </div>
+            <div class="progress" style="margin:10px 0 15px">
+              <span [style.width.%]="e.fill"></span>
+            </div>
+            <div class="row between small">
+              <span>{{ e.checkedIn }} checked in</span>
+              <span>{{ e.cancelled }} cancelled</span>
+            </div>
+            <a class="btn outline full mt" [routerLink]="['/admin/attendees', e.id]">View attendees</a>
+          } @else {
+            <h2>Next up</h2>
+            <div class="empty-inline">No open events right now.</div>
           }
         </div>
-      </div>
-
-      <div class="card chart span-7">
-        <h2>Upcoming events</h2>
-        <div class="tablewrap">
-          <table>
-            <thead>
-              <tr><th>Event</th><th>Registered</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              @for (r of tableRows(); track r.id) {
-                <tr>
-                  <td><b>{{ r.name }}</b></td>
-                  <td>
-                    {{ r.registered }} / {{ r.capacity }}
-                    <div class="bar"><i [style.width.%]="r.fill"></i></div>
-                  </td>
-                  <td><span [class]="'pill ' + r.pill">{{ r.status }}</span></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="section"><h2>Quick actions</h2></div>
-    <div class="actions">
-      <a class="btn primary full" routerLink="/admin/events/new">＋ Create event</a>
-      <a class="btn soft full mt" routerLink="/admin/attendees/sync">Sync status</a>
-      <button class="btn yellow full mt" [disabled]="finalizing()" (click)="finalizePast()">
-        {{ finalizing() ? 'Finalizing…' : 'Finalize past events' }}
-      </button>
-    </div>
-
-    @if (featured(); as e) {
-      <div class="section"><h2>{{ e.name }}</h2><a class="link" routerLink="/admin/events">Manage</a></div>
-      <div class="card">
-        <div class="row between">
-          <span class="small">Registration progress</span>
-          <strong>{{ statFor(e.id)?.registered ?? 0 }} / {{ e.capacity ?? '∞' }}</strong>
-        </div>
-        <div class="progress" style="margin:10px 0 15px">
-          <span [style.width.%]="fillPercentFor(e.id)"></span>
-        </div>
-        <a class="btn outline full" [routerLink]="['/admin/attendees', e.id]">View attendees</a>
       </div>
     }
   </div>

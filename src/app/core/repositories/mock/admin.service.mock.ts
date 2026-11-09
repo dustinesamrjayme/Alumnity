@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MockDatabase } from './mock-database.service';
-import { AdminService } from '../admin.service';
+import { AdminService, AlumniSummary } from '../admin.service';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
 
 @Injectable()
@@ -98,5 +98,19 @@ export class MockAdminService extends AdminService {
       }));
     }
     return total;
+  }
+
+  async alumniSummary(): Promise<AlumniSummary> {
+    await this.db.ensureLoaded();
+    this.requireAdmin();
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+   const members = this.db.state().users.filter((u) => u.role === 'alumni');
+    const newThisMonth = members.filter((u) => {
+      const created = (u as unknown as { created_at?: string }).created_at;
+      return created ? new Date(created) >= monthStart : false;
+    }).length;
+    return { total: members.length, newThisMonth };
   }
 }

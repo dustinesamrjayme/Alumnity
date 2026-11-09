@@ -1,4 +1,4 @@
-// Chart styles for the dashboard. Uses the app's CSS variables where they exist,
+// Dashboard styles. Uses the app's CSS variables where they exist,
 // with fallbacks taken from the PLV admin mockup.
 :host {
   --d-ink: var(--ink, #14284b);
@@ -8,9 +8,114 @@
   --d-line: var(--line, #d5dee9);
   --d-mute: var(--mute, #5c6b85);
   --d-card: var(--card, #fff);
+  --d-red: var(--red, #c94a4a);
   --d-yellow: #e8c15a;
+  --d-yellow-bg: #fbf3d9;
 }
 
+// ---------- Header ----------
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  .sub { margin-bottom: 0; }
+}
+.head-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .btn { margin-top: 0; }
+}
+
+.group-label {
+  margin: 26px 0 10px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--d-mute);
+}
+
+.mute { color: var(--d-mute); }
+
+// ---------- Notices / empty ----------
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  &.bad { border-left: 4px solid var(--d-red); }
+  .btn { margin-top: 0; }
+}
+.empty {
+  text-align: center;
+  color: var(--d-mute);
+  padding: 40px 16px;
+}
+.empty-inline {
+  color: var(--d-mute);
+  padding: 28px 8px;
+  text-align: center;
+}
+.empty-cell {
+  text-align: center;
+  color: var(--d-mute);
+  padding: 28px 10px;
+}
+
+// ---------- Needs attention ----------
+.attn {
+  h2 { margin: 0 0 10px; }
+
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--paper, #fcfdfe);
+    border: 1px solid var(--d-line);
+  }
+
+  .attn-text { flex: 1; font-weight: 500; }
+  .link { background: none; border: 0; cursor: pointer; font-weight: 700; white-space: nowrap; }
+  .link:disabled { opacity: 0.5; cursor: default; }
+
+  .attn-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: none;
+    background: var(--d-blue);
+  }
+  .tone-warn { background: var(--d-yellow-bg); border-color: var(--d-yellow); .attn-dot { background: var(--d-yellow); } }
+  .tone-bad .attn-dot { background: var(--d-red); }
+  .tone-info .attn-dot { background: var(--d-blue); }
+
+  .ok { color: var(--d-green); font-weight: 600; margin: 0; }
+}
+
+// ---------- Stat tiles ----------
+.stat.tap {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+
+  &:hover { box-shadow: 0 4px 14px rgba(20, 40, 75, 0.1); transform: translateY(-1px); }
+}
+
+// ---------- Cards / charts ----------
 .chart {
   margin-top: 16px;
 
@@ -18,30 +123,32 @@
 
   svg { width: 100%; height: auto; display: block; }
 }
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+
+  h2 { margin: 0; }
+}
 
 .ax { fill: var(--d-mute); font: 500 11px system-ui, sans-serif; }
 .gl line { stroke: var(--d-line); stroke-width: 1; }
 
-.ar { fill: var(--d-tint); opacity: 0.7; }
-.ln {
-  fill: none;
-  stroke: var(--d-blue);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.pt { fill: var(--d-card); stroke: var(--d-blue); stroke-width: 2.5; }
-
-.up { color: var(--d-green); font-weight: 700; font-size: 13px; margin-top: 8px; }
+.bar-reg { fill: var(--d-blue); }
+.bar-chk { fill: var(--d-green); }
 
 // Donut
 .dn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
 
-  svg { width: 140px; flex: none; }
+  svg { width: 160px; flex: none; }
 
   .num { font-size: 28px; font-weight: 700; fill: var(--d-ink); }
 }
@@ -52,6 +159,8 @@
 .legend {
   display: grid;
   gap: 6px;
+
+  &.inline { display: flex; gap: 16px; font-size: 13px; }
 }
 .dot {
   display: inline-block;
@@ -59,28 +168,19 @@
   height: 10px;
   border-radius: 50%;
   margin-right: 8px;
+  &.reg { background: var(--d-blue); }
   &.in { background: var(--d-green); }
   &.out { background: var(--d-yellow); }
 }
 
-// Horizontal bars
-.bars { display: grid; gap: 12px; }
-.br {
-  display: grid;
-  grid-template-columns: minmax(70px, 38%) 1fr 40px;
-  gap: 10px;
-  align-items: center;
-  font-weight: 500;
-
-  .br-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  b { text-align: right; }
-}
+// Capacity bars (inside the table)
 .bar {
   height: 8px;
   border-radius: 99px;
   background: var(--paper, #fcfdfe);
   border: 1px solid var(--d-line);
   min-width: 60px;
+  margin-top: 6px;
 
   i {
     display: block;
@@ -90,9 +190,33 @@
   }
 }
 
-// Table + status pills (from the PLV admin mockup)
+// ---------- Filter tabs ----------
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--d-tint);
+
+  button {
+    border: 0;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--d-ink);
+    cursor: pointer;
+
+    &.on { background: var(--d-card); box-shadow: 0 1px 3px rgba(20, 40, 75, 0.15); }
+    .count { color: var(--d-mute); font-weight: 500; margin-left: 4px; }
+  }
+}
+
+// ---------- Table + pills ----------
 .tablewrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 320px; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
 th {
   text-align: left;
   font-size: 12px;
@@ -108,6 +232,8 @@ td {
   vertical-align: middle;
 }
 tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
+.row-actions { text-align: right; white-space: nowrap; }
 
 .pill {
   display: inline-block;
@@ -118,17 +244,25 @@ tbody tr:last-child td { border-bottom: 0; }
   font-weight: 700;
   white-space: nowrap;
 
-  &.pg { background: var(--d-green); color: #fff; }                 // green
-  &.pr { background: var(--red, #c94a4a); color: #fff; }            // red
-  &.pt { background: var(--d-tint); color: var(--d-ink); }          // open (tint)
-  &.pf {                                                            // outlined
+  &.pg { background: var(--d-green); color: #fff; }                // open
+  &.pr { background: var(--d-red); color: #fff; }                  // full / cancelled
+  &.pa { background: var(--d-yellow-bg); color: #7a5b00; border: 1px solid var(--d-yellow); } // draft
+  &.pf {                                                           // closed / past
     background: var(--paper, #fcfdfe);
     border: 1px solid var(--d-line);
     color: var(--d-ink);
   }
 }
 
-// ---------- Web layout (CSS only) ----------
+// ---------- Quick actions ----------
+.qa {
+  display: grid;
+  gap: 10px;
+
+  .btn { margin-top: 0; width: 100%; text-align: center; }
+}
+
+// ---------- Layout ----------
 .main {
   width: 100%;
   max-width: 1200px;
@@ -140,6 +274,8 @@ tbody tr:last-child td { border-bottom: 0; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+
+  &.two { grid-template-columns: repeat(2, 1fr); }
 }
 
 .dash-grid {
@@ -149,25 +285,12 @@ tbody tr:last-child td { border-bottom: 0; }
   margin-top: 20px;
 
   .chart { margin-top: 0; min-width: 0; }
+  .span-12 { grid-column: span 12; }
   .span-8 { grid-column: span 8; }
   .span-7 { grid-column: span 7; }
   .span-5 { grid-column: span 5; }
   .span-4 { grid-column: span 4; }
 }
-
-// Donut stacks neatly in the narrower column
-.dn { justify-content: center; svg { width: 160px; } }
-
-// Quick actions sit side by side
-.actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  .btn { flex: 1; min-width: 180px; margin-top: 0; }
-}
-
-tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 
 // ---------- Responsive ----------
 @media (max-width: 1000px) {
@@ -177,5 +300,6 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 
 @media (max-width: 560px) {
   .main { padding: 16px; }
-  .stat-grid { grid-template-columns: 1fr; }
+  .stat-grid, .stat-grid.two { grid-template-columns: 1fr; }
+  .head-actions { width: 100%; .btn { flex: 1; text-align: center; } }
 }
