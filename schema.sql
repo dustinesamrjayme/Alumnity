@@ -218,3 +218,38 @@ to authenticated;   -- role checks are inside each function
 --     '0 */6 * * *',                    -- every 6 hours
 --     $$ select public.finalize_past_events(); $$
 -- );
+
+
+-- -- 1. Grant the auth admin role permission to execute the hook itself
+-- grant execute on function public.custom_access_token_hook to supabase_auth_admin;
+
+-- -- 2. Grant permission to execute the auth_role() helper function it calls
+-- grant execute on function public.auth_role() to supabase_auth_admin;
+
+-- -- 3. Ensure the auth admin can access the public schema
+-- grant usage on schema public to supabase_auth_admin;
+
+
+-- create or replace function public.custom_access_token_hook(event jsonb)
+-- returns jsonb
+-- language plpgsql
+-- security definer -- Ensures it runs with the privileges of the creator (postgres)
+-- set search_path = public
+-- as $$
+-- declare
+--     v_claims jsonb := event -> 'claims';
+--     v_role   user_role;
+-- begin
+--     -- Look up the user's role
+--     select role into v_role from public.users where id = (event ->> 'user_id')::uuid;
+    
+--     -- Inject it into the claims
+--     v_claims := jsonb_set(v_claims, '{user_role}', coalesce(to_jsonb(v_role::text), 'null'::jsonb));
+--     return jsonb_set(event, '{claims}', v_claims);
+-- exception
+--     when others then
+--         -- If anything fails, return the original event so auth doesn't break
+--         raise warning 'Error in custom_access_token_hook: %', sqlerrm;
+--         return event;
+-- end;
+-- $$;
