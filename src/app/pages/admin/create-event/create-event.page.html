@@ -16,7 +16,12 @@
             </div>
             <div class="field">
               <label for="event_date">Date and time</label>
-              <input id="event_date" type="datetime-local" formControlName="event_date" />
+              <input id="event_date" type="datetime-local" formControlName="event_date"
+                     [attr.min]="id ? null : minDate" />
+              @if (form.controls.event_date.hasError('pastDate')
+                   && (form.controls.event_date.touched || submitted())) {
+                <small class="field-error" role="alert">Pick a date and time in the future.</small>
+              }
             </div>
             <div class="field">
               <label for="description">Description</label>

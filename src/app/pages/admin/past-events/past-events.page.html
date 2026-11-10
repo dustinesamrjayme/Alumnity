@@ -4,10 +4,41 @@
     <a class="back" routerLink="/admin/events">← Manage events</a>
     <div class="eyebrow">Archive</div>
     <h1 class="title">Past events</h1>
-    <p class="sub">Closed events and attendance summaries.</p>
+    <p class="sub">Finalized events and attendance summaries.</p>
+
+    <!-- Search / filter / sort -->
+    <div class="toolbar">
+      <input class="search" type="search" placeholder="Search by name or venue"
+             aria-label="Search past events"
+             [value]="query()" (input)="query.set($any($event.target).value)" />
+      <select aria-label="Filter by year" [value]="year()" (change)="year.set($any($event.target).value)">
+        <option value="all">All years</option>
+        @for (y of years(); track y) {
+          <option [value]="y">{{ y }}</option>
+        }
+      </select>
+      <select aria-label="Filter by fee" [value]="fee()" (change)="fee.set($any($event.target).value)">
+        <option value="all">Any fee</option>
+        <option value="free">Free</option>
+        <option value="paid">Paid</option>
+      </select>
+      <select aria-label="Sort past events" [value]="sort()" (change)="sort.set($any($event.target).value)">
+        <option value="newest">Date: newest first</option>
+        <option value="oldest">Date: oldest first</option>
+        <option value="name">Name: A to Z</option>
+        <option value="registered">Most registered</option>
+        <option value="attendance_high">Highest attendance</option>
+        <option value="attendance_low">Lowest attendance</option>
+      </select>
+    </div>
+
+    <div class="result-count small">
+      {{ hasFilters() ? visible().length + ' of ' + rows().length : rows().length }}
+      event{{ visible().length === 1 ? '' : 's' }}
+    </div>
 
     <div class="past-grid">
-      @for (r of rows(); track r.id) {
+      @for (r of visible(); track r.id) {
         <div class="card chart">
           <div class="row between top">
             <div class="meta">
@@ -19,14 +50,24 @@
           <div class="stats">
             <div><span class="small">Registered</span><strong>{{ r.registered }}</strong></div>
             <div><span class="small">Checked in</span><strong>{{ r.checked_in }}</strong></div>
+            <div><span class="small">Attendance</span><strong>{{ r.attendancePct }}%</strong></div>
           </div>
           <div class="bar" role="img"
                [attr.aria-label]="r.checked_in + ' of ' + r.registered + ' registrants checked in'">
-            <i [style.width.%]="r.fillPct"></i>
+            <i [style.width.%]="r.attendancePct"></i>
           </div>
         </div>
       } @empty {
-        <div class="card empty"><p class="small">No past events yet.</p></div>
+        <div class="card empty">
+          @if (loading()) {
+            <p class="small">Loading past events…</p>
+          } @else if (hasFilters()) {
+            <p class="small">No past events match your filters.</p>
+            <button class="btn outline" (click)="clearFilters()">Clear filters</button>
+          } @else {
+            <p class="small">No past events yet.</p>
+          }
+        </div>
       }
     </div>
   </div>

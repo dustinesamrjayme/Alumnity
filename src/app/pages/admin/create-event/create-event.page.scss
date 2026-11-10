@@ -75,6 +75,11 @@
   textarea { resize: vertical; min-height: 120px; }
 }
 
+.field-error {
+  color: var(--d-red);
+  font-size: 12px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

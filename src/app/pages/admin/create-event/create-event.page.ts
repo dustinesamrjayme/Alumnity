@@ -1,6 +1,8 @@
 // create-event.page.ts
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent, ToastController } from '@ionic/angular/standalone';
 import { EventsService } from '../../../core/repositories/events.service';
@@ -20,9 +22,23 @@ export class CreateEventPage {
   submitted = signal(false);
   busy = signal(false);
 
+  /** Earliest pickable date when creating (the date picker greys out anything before it). */
+  minDate = this.toLocalInput(new Date().toISOString());
+
+  /** When editing, the date the event already had, so an old event can still be edited. */
+  private originalDate: string | null = null;
+
+  /** Rejects dates in the past, unless it's the unchanged date of an event being edited. */
+  private futureDate = (c: AbstractControl): ValidationErrors | null => {
+    const v = c.value as string;
+    if (!v) return null;
+    if (this.originalDate && v === this.originalDate) return null;
+    return new Date(v).getTime() > Date.now() ? null : { pastDate: true };
+  };
+
   form = inject(FormBuilder).nonNullable.group({
     name: ['', Validators.required],
-    event_date: ['', Validators.required],
+    event_date: ['', [Validators.required, this.futureDate]],
     venue: ['', Validators.required],
     price: [0, [Validators.required, Validators.min(0)]],
     capacity: [200 as number | null, [Validators.min(1)]],
@@ -36,8 +52,9 @@ export class CreateEventPage {
 
   private async load() {
     const e = await this.events.get(Number(this.id));
+    this.originalDate = this.toLocalInput(e.event_date);
     this.form.patchValue({
-      name: e.name, event_date: this.toLocalInput(e.event_date),
+      name: e.name, event_date: this.originalDate,
       venue: e.venue, price: e.price ?? 0, capacity: e.capacity,
       description: e.description, banner_url: e.banner_url,
     });

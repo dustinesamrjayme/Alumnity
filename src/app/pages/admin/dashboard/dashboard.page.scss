@@ -110,9 +110,6 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.15s, transform 0.15s;
-
-  &:hover { box-shadow: 0 4px 14px rgba(20, 40, 75, 0.1); transform: translateY(-1px); }
 }
 
 // ---------- Cards / charts ----------
