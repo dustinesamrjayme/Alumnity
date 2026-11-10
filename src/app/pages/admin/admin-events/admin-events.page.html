@@ -47,27 +47,34 @@
 
     <div class="event-grid">
       @for (r of visible(); track r.event.id) {
-        <div class="card">
-          <div class="row between">
-            <h2 class="event-title" style="margin:0 0 6px">{{ r.event.name }}</h2>
+        <div class="card event-card">
+          <div class="card-head row between">
+            <h2 class="event-title">{{ r.event.name }}</h2>
             <span class="pill" [class.green]="r.state === 'open'">{{ r.label }}</span>
           </div>
-          <p class="small">
-            {{ r.event.event_date | dateLabel }} · {{ r.event.venue }} · {{ r.event.price | feeLabel }}
-          </p>
-          <p class="small reg">
-            {{ r.registered }} / {{ r.capacity > 0 ? r.capacity : '∞' }} registered
-          </p>
-          <div class="row mt2">
+
+          <div class="card-meta">
+            <p class="small">
+              {{ r.event.event_date | dateLabel }} · {{ r.event.venue }} · {{ r.event.price | feeLabel }}
+            </p>
+            <p class="small reg">
+              {{ r.registered }} / {{ r.capacity > 0 ? r.capacity : '∞' }} registered
+            </p>
+          </div>
+
+          <div class="card-actions row">
             <a class="btn outline grow" [routerLink]="['/admin/events', r.event.id, 'edit']">Edit</a>
             <a class="btn success grow" [routerLink]="['/admin/attendees', r.event.id]">Attendees</a>
           </div>
-          <button class="btn outline full mt" (click)="toggle(r.event)">
-            {{ r.event.status === 'listed' ? 'Close registration' : 'Reopen registration' }}
-          </button>
-          @if (r.finalize) {
-            <button class="btn yellow full mt" (click)="finalize(r.event)">Finalize event</button>
-          }
+
+          <div class="card-more">
+            <button class="btn outline full" (click)="toggle(r.event)">
+              {{ r.event.status === 'listed' ? 'Close registration' : 'Reopen registration' }}
+            </button>
+            @if (r.finalize) {
+              <button class="btn yellow full" (click)="finalize(r.event)">Finalize event</button>
+            }
+          </div>
         </div>
       } @empty {
         <div class="card empty">

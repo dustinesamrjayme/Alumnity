@@ -70,8 +70,8 @@
         </div>
         <div class="field">
           <label for="department">Department</label>
-          <select id="department" formControlName="department">
-            @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
+          <select id="department" formControlName="department" (change)="onDepartmentChange()">
+          @for (d of departments; track d) { <option [value]="d">{{ d }}</option> }
           </select>
         </div>
         <div class="field">
