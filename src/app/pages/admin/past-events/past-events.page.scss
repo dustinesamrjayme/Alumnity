@@ -14,13 +14,50 @@
   padding: 32px;
 }
 
+// ---------- Search / filter / sort ----------
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px;
+
+  .search { flex: 1 1 240px; min-width: 200px; }
+
+  input,
+  select {
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--d-ink);
+    background: var(--paper, #fcfdfe);
+    border: 1px solid var(--d-line);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus {
+      border-color: var(--d-blue);
+      box-shadow: 0 0 0 3px rgba(36, 87, 166, 0.15);
+    }
+  }
+}
+
+.result-count { color: var(--d-mute); margin-bottom: 4px; }
+
+// ---------- Cards ----------
 .past-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  margin-top: 20px;
+  margin-top: 12px;
 
-  .empty { grid-column: 1 / -1; text-align: center; padding: 32px; }
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+  }
 }
 
 .chart { margin-top: 0; min-width: 0; }
@@ -82,4 +119,6 @@
 
 @media (max-width: 560px) {
   .main { padding: 16px; }
+  .toolbar select { flex: 1; }
+  .stats { gap: 20px; }
 }
