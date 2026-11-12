@@ -8,8 +8,15 @@ import { CheckInService } from '../../../core/repositories/checkin.service';
 import { StorageService } from '../../../core/storage.service';
 import { Department, Program } from '../../../core/models';
 
-const DEPARTMENTS: Department[] = ['CEIT', 'CABA', 'COE', 'CAS'];
-const PROGRAMS: Program[] = ['BSEE', 'BSIT', 'BSCE'];
+const PROGRAMS_BY_DEPARTMENT: Record<Department, Program[]> = {
+  CEIT: ['BSIT', 'BSCE', 'BSEE'],
+  CABA: ['BSA', 'BSBA FM', 'BSBA HRDM', 'BSBA MM'],
+  COED: ['BECED', 'BSED English', 'BSED Filipino', 'BSED Mathematics', 'BSED Science', 'BSED Social Studies'],
+  CPAG: ['BSPA'],
+  CAS:  ['BAC', 'BSP', 'BSSW'],
+};
+
+const DEPARTMENTS = Object.keys(PROGRAMS_BY_DEPARTMENT) as Department[];
 
 @Component({
   selector: 'app-profile',
@@ -27,10 +34,19 @@ export class ProfilePage {
   private alertCtrl = inject(AlertController);
 
   readonly departments = DEPARTMENTS;
-  readonly programs = PROGRAMS;
+  get programs(): Program[] {
+  return PROGRAMS_BY_DEPARTMENT[this.form.controls.department.value];
+}
+
+onDepartmentChange() {
+  this.form.controls.program.setValue(this.programs[0]);
+}
   readonly busy = signal(false);
   readonly currentYear = new Date().getFullYear();  
-  readonly years = Array.from({ length: 50 }, (_, i) => this.currentYear - i);
+  readonly years = Array.from(
+    { length: this.currentYear - 2002 + 1 },
+    (_, i) => this.currentYear - i
+  );
 
   form = inject(FormBuilder).nonNullable.group({
     first_name: ['', Validators.required],

@@ -5,8 +5,13 @@ export type EventStatus = 'listed' | 'closed';
 export type AttendeeStatus = 'not_checked_in' | 'checked_in' | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'paid' | 'free';
 export type ScanResult = 'accepted' | 'duplicate' | 'rejected';
-export type Department = 'CEIT' | 'CABA' | 'COE' | 'CAS';
-export type Program = 'BSEE' | 'BSIT' | 'BSCE';
+export type Department = 'CEIT' | 'CABA' | 'COED' | 'CPAG' | 'CAS';
+export type Program =
+  | 'BSIT' | 'BSCE' | 'BSEE'
+  | 'BSA' | 'BSBA FM' | 'BSBA HRDM' | 'BSBA MM'
+  | 'BECED' | 'BSED English' | 'BSED Filipino' | 'BSED Mathematics' | 'BSED Science' | 'BSED Social Studies'
+  | 'BSPA'
+  | 'BAC' | 'BSP' | 'BSSW';
 
 export interface AppUser {
   id: string;

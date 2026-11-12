@@ -74,28 +74,57 @@
 .event-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
+  column-gap: 20px;
+  row-gap: 0; // vertical spacing comes from the card's margin-bottom
 
   .card {
-    margin-bottom: 0;
+    margin-bottom: 20px;
     padding: 22px;
-    display: flex;
-    flex-direction: column;
 
     .small { margin: 0 0 4px; }
     .reg { font-weight: 600; }
+  }
 
-    .row.mt2 {
-      margin-top: 18px;
-      margin-bottom: 12px;
+  // Each card spans 4 rows and shares those row tracks with its neighbours,
+  // so title / meta / buttons line up across cards in the same row
+  .event-card {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+
+    .card-head {
+      align-items: flex-start;
       gap: 12px;
+      margin-bottom: 6px;
     }
 
-    button.mt { margin-top: auto; }
+    .event-title {
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .card-meta {
+      margin-bottom: 18px;
+    }
+
+    .card-actions {
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+
+    .card-more {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-self: end;
+    }
   }
 
   .empty {
     grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
     text-align: center;
     padding: 32px;
     align-items: center;

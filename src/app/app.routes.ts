@@ -9,7 +9,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage) },
   { path: 'signup', loadComponent: () => import('./pages/signup/signup.page').then((m) => m.SignUpPage) },
-  { path: 'check-email', loadComponent: () => import('./pages/check-email/check-email.page').then((m) => m.CheckEmailPage) },
+  { path: 'account-created', loadComponent: () => import('./pages/account-created/account-created.page').then((m) => m.AccountCreatedPage) },
   {
     path: 'tabs', loadComponent: shell, data: { kind: 'attendee' }, canActivate: [roleGuard('alumni')],
     children: [
