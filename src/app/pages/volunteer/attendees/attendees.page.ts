@@ -1,10 +1,11 @@
-// attendees.page.ts
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, ToastController } from '@ionic/angular/standalone';
 import { EventsService } from '../../../core/repositories/events.service';
 import { RegistrationsService } from '../../../core/repositories/registrations.service';
-import { Attendee, EventItem } from '../../../core/models';
+import { CheckInService } from '../../../core/repositories/checkin.service';
+import { OnlineStatusService } from '../../../core/online-status.service';
+import { Attendee, EventItem, PendingCheckIn } from '../../../core/models';
 import { DateLabelPipe } from '../../../shared/pipes/format.pipes';
 import { attendeesToCsv, downloadCsv } from '../../../shared/utils/csv';
 
@@ -19,11 +20,14 @@ export class VolunteerAttendeesPage {
   private id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
   private events = inject(EventsService);
   private registrations = inject(RegistrationsService);
+  private checkIn = inject(CheckInService);
+  net = inject(OnlineStatusService);
   private toastCtrl = inject(ToastController);
 
   ev = signal<EventItem | null>(null);
   attendees = signal<Attendee[]>([]);
   finalizing = signal(false);
+  processingId = signal<number | null>(null);
 
   counts = computed(() => {
     const rows = this.attendees();
@@ -39,7 +43,55 @@ export class VolunteerAttendeesPage {
 
   private async load() {
     this.ev.set(await this.events.get(this.id));
-    this.attendees.set(await this.registrations.listForEvent(this.id));
+    if (!this.net.online()) {
+      const cached = await this.checkIn.getCachedAttendeeList(this.id);
+      this.attendees.set(cached ?? []);
+    } else {
+      const fresh = await this.registrations.listForEvent(this.id);
+      await this.checkIn.cacheAttendeeList(this.id, fresh);
+      this.attendees.set(fresh);
+    }
+  }
+
+  async checkInNow(a: Attendee) {
+    if (this.processingId() !== null) return;
+    this.processingId.set(a.registration_id);
+
+    const item: PendingCheckIn = {
+      client_id: crypto.randomUUID(),
+      registration_id: a.registration_id,
+      device_time: new Date().toISOString(),
+      is_offline: !this.net.online(),
+    };
+
+    try {
+      await this.checkIn.enqueue(item);
+      
+      // Optimistic UI update
+      this.attendees.update(list => list.map(x => 
+        x.registration_id === a.registration_id 
+          ? { 
+              ...x, 
+              attendee_status: 'checked_in',
+              payment_status: x.payment_status === 'unpaid' ? 'paid' : x.payment_status
+            } 
+          : x
+      ));
+
+      if (this.net.online()) {
+        await this.checkIn.sync();
+        await this.toast(`${a.first_name} checked in.`);
+        await this.load();
+      } else {
+        await this.toast(`${a.first_name} queued for sync.`);
+        await this.checkIn.cacheAttendeeList(this.id, this.attendees());
+      }
+    } catch (e) {
+      await this.toast((e as Error).message);
+      await this.load();
+    } finally {
+      this.processingId.set(null);
+    }
   }
 
   async markNoShow(a: Attendee) {

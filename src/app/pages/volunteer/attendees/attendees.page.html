@@ -35,11 +35,17 @@
                   [class.red]="a.attendee_status === 'cancelled'">
               {{ statusLabel(a.attendee_status) }}
             </span>
-              @if (a.attendee_status === 'not_checked_in') {
-                <button class="mark-no-btn btn outline full mt2" (click)="markNoShow(a)">Mark as no-show</button>
-              }
+            @if (a.attendee_status === 'not_checked_in') {
+            <div class="row mt2 attendee-btn-group" style="gap: 8px;">
+              <button class="btn success grow" [disabled]="processingId() === a.registration_id" (click)="checkInNow(a)">
+                {{ processingId() === a.registration_id ? 'Checking in…' : 'Check in' }}
+              </button>
+              <button class="btn outline mark-cancel" (click)="markNoShow(a)">Mark as Cancelled</button>
+            </div>
+            }
           </div>
-        
+          
+  
         </div>
       } @empty {
         <div class="empty">No attendees yet.</div>
