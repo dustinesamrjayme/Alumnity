@@ -3,7 +3,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AlertController, IonContent, ToastController } from '@ionic/angular/standalone';
-import { AdminService, AlumniSummary } from '../../../core/repositories/admin.service';
+import {
+  AdminService, AlumniSummary, BatchPoint, DepartmentPoint, RegistrationTrendPoint,
+} from '../../../core/repositories/admin.service';
 import { EventsService } from '../../../core/repositories/events.service';
 import { EventDashboardStats, EventItem } from '../../../core/models';
 
@@ -30,6 +32,20 @@ const REGISTERED_INCLUDES_CANCELLED = false;
 
 // Same default grace period as finalize_past_events(p_grace_hours) in the database.
 const GRACE_HOURS = 12;
+
+// Horizontal-bar rows used by the warehouse breakdowns (batch, department)
+interface BarRow { label: string; registrations: number; checkedIn: number; width: number; rate: number; }
+function toBarRows(items: { label: string; registrations: number; checkedIn: number }[]): BarRow[] {
+  const max = Math.max(1, ...items.map((i) => i.registrations));
+  return items.map((i) => ({
+    ...i,
+    width: (i.registrations / max) * 100,
+    rate: i.registrations ? Math.round((i.checkedIn / i.registrations) * 100) : 0,
+  }));
+}
+
+// Pie slice colours (department breakdown)
+const PIE_COLORS = ['#2457a6', '#1f7a58', '#e8c15a', '#c94a4a', '#7a5fb0'];
 
 const STATUS_META: Record<EventStatus, { label: string; pill: string }> = {
   open: { label: 'Open', pill: 'pg' },
@@ -86,6 +102,7 @@ export class DashboardPage {
     } finally {
       this.loading.set(false);
     }
+    void this.loadAnalytics(); // warehouse section loads on its own; a failure here never blanks the page
   }
 
   // ---------- helpers ----------
@@ -274,6 +291,140 @@ export class DashboardPage {
     const open = this.rows().filter((r) => r.status === 'open' || r.status === 'full');
     open.sort((a, b) => (a.date?.getTime() ?? Infinity) - (b.date?.getTime() ?? Infinity));
     return open[0] ?? null;
+  });
+
+  // ---------- warehouse analytics (reads the analytics schema via admin-only RPCs) ----------
+  trend = signal<RegistrationTrendPoint[]>([]);
+  byBatch = signal<BatchPoint[]>([]);
+  byDept = signal<DepartmentPoint[]>([]);
+  analyticsLoading = signal(false);
+  analyticsError = signal<string | null>(null);
+  refreshingWarehouse = signal(false);
+
+  async loadAnalytics() {
+    this.analyticsLoading.set(true);
+    this.analyticsError.set(null);
+    try {
+      const [t, b, d] = await Promise.all([
+        this.admin.analyticsTrend(),
+        this.admin.analyticsByBatch(),
+        this.admin.analyticsByDepartment(),
+      ]);
+      this.trend.set(t);
+      this.byBatch.set(b);
+      this.byDept.set(d);
+    } catch (e) {
+      this.analyticsError.set((e as Error).message || 'Could not load analytics.');
+    } finally {
+      this.analyticsLoading.set(false);
+    }
+  }
+
+  /** Refresh button: rebuild the warehouse, then reload the live numbers and the charts. */
+  async refreshAll() {
+    this.refreshingWarehouse.set(true);
+    try {
+      await this.admin.refreshAnalytics();
+    } catch {
+      // A failed rebuild must not block the live view; the charts just keep the last nightly data.
+      await this.toast("Couldn't rebuild analytics. Showing the last nightly data.");
+    } finally {
+      this.refreshingWarehouse.set(false);
+    }
+    await this.load();
+  }
+
+  // Monthly trend: last 12 months that have data
+  private trendWindow = computed(() => this.trend().slice(-12));
+
+  private trendMax = computed(() => {
+    const max = Math.max(0, ...this.trendWindow().map((p) => p.registrations));
+    return Math.max(4, Math.ceil(max / 4) * 4);
+  });
+
+  trendTicks = computed(() => {
+    const max = this.trendMax();
+    return [0, 1, 2, 3, 4].map((i) => ({
+      value: (max / 4) * i,
+      y: Y_BASE - ((Y_BASE - Y_TOP) / 4) * i,
+    }));
+  });
+
+  trendBars = computed(() => {
+    const pts = this.trendWindow();
+    const max = this.trendMax();
+    const slot = (X1 - X0) / Math.max(pts.length, 1);
+    const bw = Math.min(28, slot * 0.5);
+    return pts.map((p, i) => {
+      const cx = X0 + slot * i + slot / 2;
+      const h = (p.registrations / max) * (Y_BASE - Y_TOP);
+      const d = new Date(p.year, p.month - 1, 1);
+      const revenue = +p.revenue || 0;
+      return {
+        key: p.year * 100 + p.month,
+        label: d.toLocaleString('en', { month: 'short' }) + " '" + String(p.year).slice(2),
+        full: d.toLocaleString('en', { month: 'long', year: 'numeric' }),
+        cx, bw, x: cx - bw / 2, y: Y_BASE - h, h,
+        registrations: p.registrations,
+        revenueText: '₱' + revenue.toLocaleString('en-PH', { maximumFractionDigits: 0 }),
+      };
+    });
+  });
+
+  totalRevenue = computed(() => this.trend().reduce((n, p) => n + (+p.revenue || 0), 0));
+  revenueLabel = computed(() => '₱' + this.totalRevenue().toLocaleString('en-PH', { maximumFractionDigits: 0 }));
+  warehouseRegistrations = computed(() => this.trend().reduce((n, p) => n + p.registrations, 0));
+
+  // Breakdown by graduation batch (newest first, top 8)
+  batchRows = computed<BarRow[]>(() =>
+    toBarRows(
+      [...this.byBatch()]
+        .sort((a, b) => b.batch - a.batch)
+        .slice(0, 8)
+        .map((b) => ({ label: String(b.batch), registrations: b.registrations, checkedIn: b.checked_in })),
+    ));
+
+  // Breakdown by department (programs rolled up)
+  deptRows = computed<BarRow[]>(() => {
+    const m = new Map<string, { registrations: number; checkedIn: number }>();
+    for (const r of this.byDept()) {
+      const cur = m.get(r.department) ?? { registrations: 0, checkedIn: 0 };
+      cur.registrations += r.registrations;
+      cur.checkedIn += r.checked_in;
+      m.set(r.department, cur);
+    }
+    return toBarRows(
+      [...m.entries()]
+        .map(([label, v]) => ({ label, ...v }))
+        .sort((a, b) => b.registrations - a.registrations),
+    );
+  });
+
+  // Department pie: one slice per department, sized by registrations
+  deptPie = computed(() => {
+    const rows = this.deptRows().filter((r) => r.registrations > 0);
+    const total = rows.reduce((n, r) => n + r.registrations, 0);
+    const CX = 70, CY = 70, PR = 62;
+    let angle = -Math.PI / 2;
+    const slices = rows.map((r, i) => {
+      const frac = r.registrations / total;
+      const a0 = angle;
+      const a1 = angle + frac * 2 * Math.PI;
+      angle = a1;
+      const x0 = CX + PR * Math.cos(a0), y0 = CY + PR * Math.sin(a0);
+      const x1 = CX + PR * Math.cos(a1), y1 = CY + PR * Math.sin(a1);
+      const full = frac >= 0.9999; // a single department can't be drawn as an arc
+      return {
+        label: r.label,
+        registrations: r.registrations,
+        rate: r.rate,
+        pct: Math.round(frac * 100),
+        fill: PIE_COLORS[i % PIE_COLORS.length],
+        path: full ? null
+          : `M ${CX} ${CY} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${PR} ${PR} 0 ${frac > 0.5 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`,
+      };
+    });
+    return { total, slices };
   });
 
   // ---------- actions ----------

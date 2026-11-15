@@ -116,11 +116,13 @@
 .chart {
   margin-top: 16px;
 
-  h2 { margin: 0 0 8px; }
+  h2 { margin: 0 0 8px;   text-align: center;}
 
-  svg { width: 100%; height: auto; display: block; }
+  svg { width: 100%; height: auto; display: block;}
+
 }
 .chart-head {
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -142,6 +144,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   gap: 20px;
   flex-wrap: wrap;
 
@@ -186,6 +189,8 @@
     background: var(--d-blue);
   }
 }
+
+.bar-green {fill: var(--d-green);}
 
 // ---------- Filter tabs ----------
 .tabs {
@@ -259,6 +264,41 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
   .btn { margin-top: 0; width: 100%; text-align: center; }
 }
 
+// ---------- Warehouse analytics ----------
+.foot { margin-top: 6px; }
+.pie-s { stroke: var(--d-card); stroke-width: 1.5; }
+.kpi-inline { font-weight: 700; color: var(--d-ink); }
+
+.hbars { display: grid; gap: 12px; margin-top: 8px; }
+.hrow {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.hl {
+  font-weight: 600;
+  color: var(--d-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.htrack {
+  height: 10px;
+  border-radius: 99px;
+  background: var(--paper, #fcfdfe);
+  border: 1px solid var(--d-line);
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    background: var(--d-blue);
+  }
+}
+.hv { font-weight: 700; white-space: nowrap; .mute { font-weight: 500; } }
+
 // ---------- Layout ----------
 .main {
   width: 100%;
@@ -283,10 +323,10 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 
   .chart { margin-top: 0; min-width: 0; }
   .span-12 { grid-column: span 12; }
-  .span-8 { grid-column: span 8; }
+  .span-9 { grid-column: span 9; }
   .span-7 { grid-column: span 7; }
   .span-5 { grid-column: span 5; }
-  .span-4 { grid-column: span 4; }
+  .span-3 { grid-column: span 3; }
 }
 
 // ---------- Responsive ----------

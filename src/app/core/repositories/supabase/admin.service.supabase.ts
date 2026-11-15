@@ -3,6 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../../environments/environment';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
 import { AdminService, AlumniSummary } from '../admin.service';
+import { RegistrationTrendPoint, BatchPoint, DepartmentPoint } from '../admin.service';
 
 @Injectable()
 export class SupabaseAdminService extends AdminService {
@@ -46,5 +47,19 @@ export class SupabaseAdminService extends AdminService {
 
   async alumniSummary(): Promise<AlumniSummary> {
     return this.unwrap(await this.sb.rpc('get_alumni_summary'));
+  }
+
+
+  async analyticsTrend(): Promise<RegistrationTrendPoint[]> {
+    return (this.unwrap(await this.sb.rpc('get_registration_trend')) ?? []) as RegistrationTrendPoint[];
+  }
+  async analyticsByBatch(): Promise<BatchPoint[]> {
+    return (this.unwrap(await this.sb.rpc('get_registrations_by_batch')) ?? []) as BatchPoint[];
+  }
+  async analyticsByDepartment(): Promise<DepartmentPoint[]> {
+    return (this.unwrap(await this.sb.rpc('get_registrations_by_department')) ?? []) as DepartmentPoint[];
+  }
+  async refreshAnalytics(): Promise<void> {
+    this.unwrap(await this.sb.rpc('refresh_analytics'));
   }
 }

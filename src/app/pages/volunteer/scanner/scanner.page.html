@@ -30,24 +30,58 @@
       </section>
 
       <!-- Right Column: Manual Lookup & List -->
-      <div class="card chart">
-        <h2>Manual Lookup</h2>
+      <div class="span-7 stack">
         
-        <!-- UUID / Ticket Code input -->
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input #codeInput class="grow" placeholder="Enter Ticket ID (e.g., PLV-00482) " 
-                style="flex: 1;"
-                (keyup.enter)="manualLookup(codeInput.value)" />
-          <button class="btn primary" style="flex: none;" (click)="manualLookup(codeInput.value)">Check</button>
+        <!-- Manual Lookup -->
+        <div class="card chart">
+          <h2>Manual Lookup</h2>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input #codeInput class="grow" placeholder="Enter Ticket ID (e.g., PLV-00482)" 
+                  style="flex: 1;"
+                  (keyup.enter)="manualLookup(codeInput.value)" />
+            <button class="btn primary" style="flex: none;" (click)="manualLookup(codeInput.value)">Check</button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input class="grow" placeholder="Search name…"
+                  style="flex: 1;"
+                  (input)="search.set($any($event.target).value)" />
+            <a class="btn outline" style="flex: none;" [routerLink]="['/volunteer/attendees', id()]">Full list</a>
+          </div>
         </div>
 
-        <!-- Name Search -->
-        <div style="display: flex; gap: 8px;">
-          <input class="grow" placeholder="Search name…"
-                style="flex: 1;"
-                (input)="search.set($any($event.target).value)" />
-          <a class="btn outline" style="flex: none;" [routerLink]="['/volunteer/attendees', id()]">Full list</a>
-        </div>
+        <!-- THE MISSING ATTENDEE LIST -->
+        @for (a of list(); track a.registration_id) {
+          <div class="card">
+            <div class="row between">
+              <div>
+                <h3 style="font:800 15px Manrope;margin:0 0 5px">{{ a.first_name }} {{ a.last_name }}</h3>
+                <p class="small">{{ a.payment_status }}</p>
+              </div>
+              <span class="pill"
+                    [class.green]="a.attendee_status === 'checked_in'"
+                    [class.yellow]="a.attendee_status === 'not_checked_in'"
+                    [class.red]="a.attendee_status === 'cancelled'">
+                {{ statusLabel(a.attendee_status) }}
+              </span>
+            </div>
+            
+            @if (a.attendee_status === 'not_checked_in') {
+              <div class="row mt2" style="gap:8px">
+                <button class="btn success grow" [disabled]="processingId() === a.registration_id" (click)="checkInNow(a)">
+                  {{ processingId() === a.registration_id ? 'Checking in…' : 'Check in' }}
+                </button>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="empty">
+            @if (!net.online() && attendees().length === 0) {
+              Offline with no cached list. Reconnect to download it first.
+            } @else {
+              No attendees match.
+            }
+          </div>
+        }
       </div>
     </div>
   </div>

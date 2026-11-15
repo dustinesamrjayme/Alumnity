@@ -9,8 +9,8 @@
         <p class="sub">Alumni events, attendance and accounts at a glance.</p>
       </div>
       <div class="head-actions">
-        <button class="btn soft" (click)="load()" [disabled]="loading()">
-          {{ loading() ? 'Refreshing…' : 'Refresh' }}
+        <button class="btn soft" (click)="refreshAll()" [disabled]="loading() || refreshingWarehouse()">
+          {{ loading() || refreshingWarehouse() ? 'Refreshing…' : 'Refresh' }}
         </button>
         <a class="btn primary" routerLink="/admin/events/new">＋ Create event</a>
       </div>
@@ -94,7 +94,7 @@
 
       <!-- Charts -->
       <div class="dash-grid">
-        <div class="card chart span-8">
+        <div class="card chart span-9">
           <div class="chart-head">
             <h2>Registrations by event</h2>
             <div class="legend inline">
@@ -133,7 +133,7 @@
           }
         </div>
 
-        <div class="card chart span-4">
+        <div class="card chart span-3">
           <h2>Check-in status</h2>
           <div class="dn">
             <svg viewBox="0 0 140 140" role="img"
@@ -155,6 +155,100 @@
               <div><i class="dot in"></i>{{ checkedIn() }} checked in</div>
               <div><i class="dot out"></i>{{ notCheckedIn() }} not checked in</div>
             </div>
+          </div>
+        </div>
+
+        @if (analyticsError(); as msg) {
+          <div class="card notice bad span-12" style="margin-bottom:0">
+            <div>
+              <strong>Couldn't load analytics</strong>
+              <div class="small">{{ msg }}</div>
+            </div>
+            <button class="btn outline" (click)="loadAnalytics()">Try again</button>
+          </div>
+        }
+
+        <div class="card chart span-9">
+          <div class="chart-head">
+            <h2>Registrations by month</h2>
+            <div class="small mute">Revenue collected: <span class="kpi-inline">{{ revenueLabel() }}</span></div>
+          </div>
+          @if (trendBars().length) {
+            <svg viewBox="0 0 620 230" role="img"
+                 [attr.aria-label]="'Registrations per month, ' + warehouseRegistrations() + ' in total'">
+              <g class="gl">
+                @for (t of trendTicks(); track t.y) {
+                  <line [attr.x1]="40" [attr.x2]="600" [attr.y1]="t.y" [attr.y2]="t.y" />
+                }
+              </g>
+              <g class="ax" text-anchor="end">
+                @for (t of trendTicks(); track t.y) {
+                  <text x="32" [attr.y]="t.y + 4">{{ t.value }}</text>
+                }
+              </g>
+              @for (b of trendBars(); track b.key) {
+                <g>
+                  <title>{{ b.full }}: {{ b.registrations }} registered, {{ b.revenueText }} collected</title>
+                  <rect class="bar-reg bar-green" rx="3" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.bw" [attr.height]="b.h" />
+                  <text class="ax" text-anchor="middle" [attr.x]="b.cx" y="212">{{ b.label }}</text>
+                </g>
+              }
+            </svg>
+            <div class="small mute foot">Warehouse data, refreshed nightly or when you press Refresh.</div>
+          } @else {
+            <div class="empty-inline">No registrations in the warehouse yet.</div>
+          }
+        </div>
+
+        <div class="card chart span-3">
+          <h2>By department</h2>
+          @if (deptPie(); as pie) {
+            @if (pie.total) {
+              <div class="dn">
+                <svg viewBox="0 0 140 140" role="img"
+                     [attr.aria-label]="'Registrations by department, ' + pie.total + ' in total'">
+                  @for (p of pie.slices; track p.label) {
+                    @if (p.path) {
+                      <path class="pie-s" [attr.d]="p.path" [attr.fill]="p.fill">
+                        <title>{{ p.label }}: {{ p.registrations }} registered ({{ p.pct }}%), {{ p.rate }}% checked in</title>
+                      </path>
+                    } @else {
+                      <circle class="pie-s" cx="70" cy="70" r="62" [attr.fill]="p.fill">
+                        <title>{{ p.label }}: {{ p.registrations }} registered (100%), {{ p.rate }}% checked in</title>
+                      </circle>
+                    }
+                  }
+                </svg>
+                <div class="legend">
+                  @for (p of pie.slices; track p.label) {
+                    <div [title]="p.rate + '% checked in'">
+                      <i class="dot" [style.background]="p.fill"></i>{{ p.label }}
+                      <b>{{ p.registrations }}</b> <span class="mute">· {{ p.pct }}%</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="empty-inline">No data yet.</div>
+            }
+          }
+        </div>
+
+        <div class="card chart span-12">
+          <div class="chart-head">
+            <h2>By graduation batch</h2>
+            <div class="small mute">Registrations, with the share who checked in</div>
+          </div>
+          <div class="hbars">
+            @for (r of batchRows(); track r.label) {
+              <div class="hrow" [title]="r.registrations + ' registered, ' + r.checkedIn + ' checked in'">
+                <span class="hl">Batch {{ r.label }}</span>
+                <div class="htrack"><i [style.width.%]="r.width"></i></div>
+                <span class="hv">{{ r.registrations }} <span class="mute">· {{ r.rate }}% in</span></span>
+              </div>
+            } @empty {
+              <div class="empty-inline">No data yet.</div>
+            }
           </div>
         </div>
 
@@ -249,6 +343,7 @@
           }
         </div>
       </div>
+
     }
   </div>
 </ion-content>
