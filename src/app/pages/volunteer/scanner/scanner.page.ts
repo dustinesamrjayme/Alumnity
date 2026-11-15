@@ -80,37 +80,27 @@ export class VolunteerScannerPage {
   async startScan() {
     try {
       this.isScanning.set(true);
-      
-      // Request permission
       const permission = await BarcodeScanner.requestPermissions();
       if (permission.camera !== 'granted') {
         await this.toast('Camera permission denied. Use manual entry.');
         return;
       }
-
-      // Open native camera
-      const { barcodes } = await BarcodeScanner.scan({
-        formats: [BarcodeFormat.QrCode],
-      });
-
+      const { barcodes } = await BarcodeScanner.scan({ formats: [BarcodeFormat.QrCode] });
       if (barcodes.length > 0) {
-        const scannedUuid = barcodes[0].rawValue;
-        await this.manualLookup(scannedUuid);
+        await this.manualLookup(barcodes[0].rawValue);
       }
     } catch (e) {
-      await this.toast('Camera failed to open. Are you on a web browser?');
+      await this.toast('Camera failed to open. Use manual entry.');
     } finally {
       this.isScanning.set(false);
     }
   }
 
   // --- LOOKUP LOGIC ---
-    // Rename scanUuid to manualLookup
   async manualLookup(code: string) {
     const cleanCode = code.trim().toUpperCase();
     if (!cleanCode) return;
 
-    // Try to find the attendee by UUID, formatted display ID (PLV-00482), or raw integer (482)
     const attendee = this.attendees().find((a) => {
       const formattedId = `PLV-${a.registration_id.toString().padStart(5, '0')}`;
       return a.qr_token === code.trim() || 
@@ -122,32 +112,17 @@ export class VolunteerScannerPage {
       await this.toast('Invalid ticket code or UUID.');
       return;
     }
-
     if (attendee.attendee_status === 'checked_in') {
       await this.toast(`${attendee.first_name} is already checked in.`);
       return;
     }
-
     if (attendee.attendee_status === 'cancelled') {
       await this.toast(`${attendee.first_name}'s ticket is cancelled.`);
       return;
     }
 
-    if (attendee.payment_status === 'unpaid') {
-      await this.toast(`${attendee.first_name} has an unpaid balance. Collect payment first.`);
-      return;
-    }
-
+    // REMOVED: The unpaid check. We just check them in now.
     await this.checkInNow(attendee);
-  }
-
-  async collectPayment(a: Attendee) {
-    if (!this.net.online()) { await this.toast('Come online to collect payment.'); return; }
-    try {
-      await this.checkIn.confirmPayment(a.registration_id);
-      await this.toast(`${a.first_name} paid. Now check them in.`);
-      await this.loadAttendees();
-    } catch (e) { await this.toast((e as Error).message); }
   }
 
   async checkInNow(a: Attendee) {
@@ -164,9 +139,14 @@ export class VolunteerScannerPage {
     try {
       await this.checkIn.enqueue(item);
       
+      // Optimistic UI update: Auto-mark as paid if they were unpaid
       this.attendees.update(list => list.map(x => 
         x.registration_id === a.registration_id 
-          ? { ...x, attendee_status: 'checked_in' } 
+          ? { 
+              ...x, 
+              attendee_status: 'checked_in',
+              payment_status: x.payment_status === 'unpaid' ? 'paid' : x.payment_status
+            } 
           : x
       ));
 

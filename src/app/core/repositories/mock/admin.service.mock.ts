@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { MockDatabase } from './mock-database.service';
 import { AdminService, AlumniSummary } from '../admin.service';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
+import { RegistrationTrendPoint, BatchPoint, DepartmentPoint } from '../admin.service';
 
 @Injectable()
 export class MockAdminService extends AdminService {
@@ -113,4 +114,38 @@ export class MockAdminService extends AdminService {
     }).length;
     return { total: members.length, newThisMonth };
   }
+
+  private guardAdmin() { if (this.db.currentRole() !== 'admin') throw new Error('Not allowed.'); }
+
+  async analyticsTrend(): Promise<RegistrationTrendPoint[]> {
+    this.guardAdmin();
+    return [
+      { year: 2026, month: 6,  registrations: 12, revenue: 3600 },
+      { year: 2026, month: 7,  registrations: 20, revenue: 6000 },
+      { year: 2026, month: 8,  registrations: 9,  revenue: 2700 },
+      { year: 2026, month: 9,  registrations: 31, revenue: 9300 },
+      { year: 2026, month: 10, registrations: 24, revenue: 7200 },
+      { year: 2026, month: 11, registrations: 15, revenue: 4500 },
+    ];
+  }
+  async analyticsByBatch(): Promise<BatchPoint[]> {
+    this.guardAdmin();
+    return [
+      { batch: 2010, registrations: 14, checked_in: 11 },
+      { batch: 2016, registrations: 22, checked_in: 15 },
+      { batch: 2020, registrations: 31, checked_in: 18 },
+      { batch: 2024, registrations: 18, checked_in: 12 },
+    ];
+  }
+  async analyticsByDepartment(): Promise<DepartmentPoint[]> {
+    this.guardAdmin();
+    return [
+      { department: 'CEIT', program: 'BSIT', registrations: 30, checked_in: 21 },
+      { department: 'CEIT', program: 'BSCE', registrations: 8,  checked_in: 5 },
+      { department: 'CABA', program: 'BSA',  registrations: 19, checked_in: 12 },
+      { department: 'COED', program: 'BECED', registrations: 16, checked_in: 10 },
+      { department: 'CAS',  program: 'BSSW', registrations: 12, checked_in: 8 },
+    ];
+  }
+  async refreshAnalytics(): Promise<void> { this.guardAdmin(); }
 }

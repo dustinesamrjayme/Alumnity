@@ -35,10 +35,11 @@
                   [class.red]="a.attendee_status === 'cancelled'">
               {{ statusLabel(a.attendee_status) }}
             </span>
+              @if (a.attendee_status === 'not_checked_in') {
+                <button class="mark-no-btn btn outline full mt2" (click)="markNoShow(a)">Mark as no-show</button>
+              }
           </div>
-          @if (a.attendee_status === 'not_checked_in') {
-            <button class="btn outline full mt2" (click)="markNoShow(a)">Mark as no-show</button>
-          }
+        
         </div>
       } @empty {
         <div class="empty">No attendees yet.</div>

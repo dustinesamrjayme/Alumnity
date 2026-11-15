@@ -9,27 +9,30 @@
     </div>
 
     @for (e of list(); track e.id) {
-      <article class="card event-card">
-        <div class="event-cover"
-             [class.green]="(e.id | eventTheme) === 'green'"
-             [class.sky]="(e.id | eventTheme) === 'sky'">
-          <span class="pill" [class.green]="(e.id | eventTheme) === 'green'">
-            {{ e.event_date | dateLabel }}
-          </span>
-        </div>
-        <div class="event-content">
-          <h2 class="event-title">{{ e.name }}</h2>
-          <div class="event-meta">
-            <span>⌖ {{ e.venue }}</span>
-            <span>{{ e.status === 'listed' ? 'Open' : 'Closed' }}</span>
-            <span>{{ e.price | feeLabel }}</span>
+      @if (e.status === 'listed')  {
+        <article class="card event-card">
+          <div class="event-cover"
+              [class.green]="(e.id | eventTheme) === 'green'"
+              [class.sky]="(e.id | eventTheme) === 'sky'">
+            <span class="pill" [class.green]="(e.id | eventTheme) === 'green'">
+              {{ e.event_date | dateLabel }}
+            </span>
           </div>
-          <div class="event-bottom">
-            <a class="btn primary grow" [routerLink]="['/volunteer/scanner', e.id]">Scan</a>
-            <a class="btn outline grow" [routerLink]="['/volunteer/attendees', e.id]">Attendees</a>
+          <div class="event-content">
+            <h2 class="event-title">{{ e.name }}</h2>
+            <div class="event-meta">
+              <span>⌖ {{ e.venue }}</span>
+              <span>{{ e.status === 'listed' ? 'Open' : 'Closed' }}</span>
+              <span>{{ e.price | feeLabel }}</span>
+            </div>
+            <div class="event-bottom">
+              <a class="btn primary grow" [routerLink]="['/volunteer/scanner', e.id]">Scan</a>
+              <a class="btn outline grow" [routerLink]="['/volunteer/attendees', e.id]">Attendees</a>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+      }
+      
     } @empty {
       <div class="empty">No events to scan.</div>
     }
