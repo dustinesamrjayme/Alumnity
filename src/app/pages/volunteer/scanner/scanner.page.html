@@ -64,14 +64,6 @@
                 {{ statusLabel(a.attendee_status) }}
               </span>
             </div>
-            
-            @if (a.attendee_status === 'not_checked_in') {
-              <div class="row mt2" style="gap:8px">
-                <button class="btn success grow" [disabled]="processingId() === a.registration_id" (click)="checkInNow(a)">
-                  {{ processingId() === a.registration_id ? 'Checking in…' : 'Check in' }}
-                </button>
-              </div>
-            }
           </div>
         } @empty {
           <div class="empty">

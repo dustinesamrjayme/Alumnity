@@ -2,8 +2,9 @@
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .pill.red { background: #fbe4e4; color: var(--red); }
 
-.mark-no-btn {
-    width: 20%;
+.mark-cancel {
+    flex: none; 
+    white-space: nowrap; 
 }
 
 @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
