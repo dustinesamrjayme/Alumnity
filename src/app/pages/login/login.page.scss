@@ -67,7 +67,7 @@ ion-content.login-content {
 }
 
 .login-brand p {
-  font: 500 13px/1.4 'DM Sans', sans-serif;
+  font: 500 15px/1.4 'DM Sans', sans-serif;
   color: #8bd1b1;
   margin: 7px 0 0;
 }
@@ -83,6 +83,8 @@ ion-content.login-content {
   flex: 1;
   min-height: 430px;
   margin-top: -1px;
+
+
 }
 
 .login-panel .title {
@@ -91,7 +93,7 @@ ion-content.login-content {
 }
 
 .login-panel .sub {
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 20px;
 }
 
@@ -112,7 +114,7 @@ ion-content.login-content {
 }
 
 .login-panel .login-links {
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   margin-top: 17px;
   color: var(--muted);

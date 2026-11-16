@@ -48,8 +48,6 @@ export class SupabaseAdminService extends AdminService {
   async alumniSummary(): Promise<AlumniSummary> {
     return this.unwrap(await this.sb.rpc('get_alumni_summary'));
   }
-
-
   async analyticsTrend(): Promise<RegistrationTrendPoint[]> {
     return (this.unwrap(await this.sb.rpc('get_registration_trend')) ?? []) as RegistrationTrendPoint[];
   }
