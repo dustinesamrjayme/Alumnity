@@ -1,10 +1,10 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../../environments/environment';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { CheckInService } from '../checkin.service';
 import { StorageService } from '../../storage.service';
 import { Attendee, CheckInLogEntry, PendingCheckIn, Registration, SyncResult } from '../../models';
 import { inject } from '@angular/core';
+import { SUPABASE_CLIENT } from '../../supabase-client';
 
 const QUEUE_KEY = 'plv.checkin.queue.v1';
 const CACHE_KEY = 'plv.checkin.cache.v1';
@@ -12,9 +12,7 @@ const SYNC_KEY = 'plv.checkin.lastSync.v1';
 
 @Injectable()
 export class SupabaseCheckInService extends CheckInService {
-  private sb: SupabaseClient = createClient(
-    environment.supabaseUrl, environment.supabaseAnonKey,
-  );
+  private sb: SupabaseClient = inject(SUPABASE_CLIENT);
   private storage = inject(StorageService);
 
   private _queue = signal<PendingCheckIn[]>([]);

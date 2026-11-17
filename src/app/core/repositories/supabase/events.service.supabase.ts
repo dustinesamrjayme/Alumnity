@@ -1,16 +1,14 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { EventsService } from '../events.service';
 import {
   EventAvailability, EventItem, EventUpdate, EventWithAvailability, NewEvent,
 } from '../../models';
+import { SUPABASE_CLIENT } from '../../supabase-client';
 
 @Injectable()
 export class SupabaseEventsService extends EventsService {
-  private sb: SupabaseClient = createClient(
-    environment.supabaseUrl, environment.supabaseAnonKey,
-  );
+  private sb: SupabaseClient = inject(SUPABASE_CLIENT);
 
   private unwrap<T>(res: { data: T | null; error: { message: string; code?: string } | null }): T {
     if (res.error) {
