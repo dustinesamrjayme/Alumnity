@@ -1,17 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../../environments/environment';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthService } from '../auth.service';
 import {
   AppUser, ProfileUpdate, SignInInput, SignUpInput, UserRole, USER_COLUMNS,
 } from '../../models';
+import { SUPABASE_CLIENT } from '../../supabase-client';
 
 @Injectable()
 export class SupabaseAuthService extends AuthService {
-  private sb: SupabaseClient = createClient(
-    environment.supabaseUrl, environment.supabaseAnonKey,
-    { auth: { persistSession: true, autoRefreshToken: true } },
-  );
+  private sb: SupabaseClient = inject(SUPABASE_CLIENT);
 
   private _currentUser = signal<AppUser | null>(null);
   private _currentRole = signal<UserRole | null>(null);

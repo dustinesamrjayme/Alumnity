@@ -1,14 +1,12 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { RegistrationsService } from '../registrations.service';
 import { Attendee, MyTicket, Registration } from '../../models';
+import { SUPABASE_CLIENT } from '../../supabase-client';
 
 @Injectable()
 export class SupabaseRegistrationsService extends RegistrationsService {
-  private sb: SupabaseClient = createClient(
-    environment.supabaseUrl, environment.supabaseAnonKey,
-  );
+  private sb: SupabaseClient = inject(SUPABASE_CLIENT);
 
   private unwrap<T>(res: { data: T | null; error: { message: string; code?: string } | null }): T {
     if (res.error) {

@@ -18,6 +18,7 @@ import { SupabaseEventsService } from './supabase/events.service.supabase';
 import { SupabaseRegistrationsService } from './supabase/registrations.service.supabase';
 import { SupabaseCheckInService } from './supabase/checkin.service.supabase';
 import { SupabaseAdminService } from './supabase/admin.service.supabase';
+import { SUPABASE_CLIENT, supabaseClient } from '../supabase-client'; 
 
 const MOCK: Provider[] = [
   { provide: AuthService, useClass: MockAuthService },
@@ -28,6 +29,7 @@ const MOCK: Provider[] = [
 ];
 
 const SUPABASE: Provider[] = [
+  { provide: SUPABASE_CLIENT, useValue: supabaseClient },
   { provide: AuthService, useClass: SupabaseAuthService },
   { provide: EventsService, useClass: SupabaseEventsService },
   { provide: RegistrationsService, useClass: SupabaseRegistrationsService },
