@@ -18,11 +18,25 @@
             {{ net.online() ? 'Online' : 'Offline' }} · {{ checkIn.pendingCount() }} pending
           </span>
         </div>
-        <div class="scan-frame" aria-hidden="true">▦</div>
+
+        <!-- Placeholder: shown when the web camera isn't running -->
+        @if (isNative || !isScanning()) {
+          <div class="scan-frame" aria-hidden="true">▦</div>
+        }
+
+        <!-- Web camera feed: always in the DOM, hidden until scanning -->
+        <div id="qr-reader" class="qr-reader" [hidden]="isNative || !isScanning()"></div>
+
         <p class="scan-note">Point the camera at the attendee's QR code.</p>
-        <button class="btn primary full" [disabled]="isScanning()" (click)="startScan()">
-          {{ isScanning() ? 'Opening Camera…' : 'Open Camera' }}
-        </button>
+
+        @if (!isNative && isScanning()) {
+          <button class="btn outline full" (click)="stopWebScan()">Stop Camera</button>
+        } @else {
+          <button class="btn primary full" [disabled]="isScanning()" (click)="startScan()">
+            {{ isScanning() ? 'Opening Camera…' : 'Open Camera' }}
+          </button>
+        }
+
         <div class="row mt2" style="gap:8px">
           <button class="btn outline grow" [disabled]="!net.online()" (click)="refreshList()">Refresh list</button>
           <a class="btn soft grow" routerLink="/volunteer/sync">Sync</a>
@@ -31,12 +45,12 @@
 
       <!-- Right Column: Manual Lookup & List -->
       <div class="span-7 stack">
-        
+
         <!-- Manual Lookup -->
         <div class="card chart">
           <h2>Manual Lookup</h2>
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input #codeInput class="grow" placeholder="Enter Ticket ID (e.g., PLV-00482)" 
+            <input #codeInput class="grow" placeholder="Enter Ticket ID (e.g., PLV-00482)"
                   style="flex: 1;"
                   (keyup.enter)="manualLookup(codeInput.value)" />
             <button class="btn primary" style="flex: none;" (click)="manualLookup(codeInput.value)">Check</button>
@@ -49,7 +63,7 @@
           </div>
         </div>
 
-        <!-- THE MISSING ATTENDEE LIST -->
+        <!-- Attendee list -->
         @for (a of list(); track a.registration_id) {
           <div class="card">
             <div class="row between">

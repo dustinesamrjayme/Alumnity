@@ -39,11 +39,12 @@
             <div class="form-grid">
               <div class="field">
                 <label for="price">Fee (₱)</label>
-                <input id="price" type="number" min="0" formControlName="price" />
+                <input id="price" type="number" inputmode="decimal" min="0" formControlName="price" />
               </div>
               <div class="field">
                 <label for="capacity">Capacity</label>
-                <input id="capacity" type="number" min="1" formControlName="capacity" placeholder="200" />
+                <input id="capacity" type="number" inputmode="numeric" min="1"
+                       formControlName="capacity" placeholder="200" />
               </div>
             </div>
           </div>
