@@ -50,6 +50,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 
   &.bad { border-left: 4px solid var(--d-red); }
@@ -87,7 +88,7 @@
     border: 1px solid var(--d-line);
   }
 
-  .attn-text { flex: 1; font-weight: 500; }
+  .attn-text { flex: 1; min-width: 0; font-weight: 500; overflow-wrap: anywhere; }
   .link { background: none; border: 0; cursor: pointer; font-weight: 700; white-space: nowrap; }
   .link:disabled { opacity: 0.5; cursor: default; }
 
@@ -106,6 +107,7 @@
 }
 
 // ---------- Stat tiles ----------
+.stat { min-width: 0; overflow-wrap: anywhere; }
 .stat.tap {
   display: block;
   text-decoration: none;
@@ -113,16 +115,16 @@
 }
 
 // ---------- Cards / charts ----------
+.card { box-sizing: border-box; min-width: 0; max-width: 100%; }
+
 .chart {
   margin-top: 16px;
 
-  h2 { margin: 0 0 8px;   text-align: center;}
+  h2 { margin: 0 0 8px; text-align: center; }
 
-  svg { width: 100%; height: auto; display: block;}
-
+  svg { width: 100%; height: auto; display: block; }
 }
 .chart-head {
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -138,8 +140,9 @@
 
 .bar-reg { fill: var(--d-blue); }
 .bar-chk { fill: var(--d-green); }
+.bar-green { fill: var(--d-green); }
 
-// Donut
+// Donut / pie
 .dn {
   display: flex;
   align-items: center;
@@ -148,7 +151,7 @@
   gap: 20px;
   flex-wrap: wrap;
 
-  svg { width: 160px; flex: none; }
+  svg { width: 160px; max-width: 100%; flex: none; }
 
   .num { font-size: 28px; font-weight: 700; fill: var(--d-ink); }
 }
@@ -159,8 +162,10 @@
 .legend {
   display: grid;
   gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 
-  &.inline { display: flex; gap: 16px; font-size: 13px; }
+  &.inline { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; }
 }
 .dot {
   display: inline-block;
@@ -190,13 +195,13 @@
   }
 }
 
-.bar-green {fill: var(--d-green);}
-
 // ---------- Filter tabs ----------
 .tabs {
   display: inline-flex;
   gap: 4px;
   padding: 3px;
+  max-width: 100%;
+  box-sizing: border-box;
   border-radius: 999px;
   background: var(--d-tint);
 
@@ -209,6 +214,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--d-ink);
+    white-space: nowrap;
     cursor: pointer;
 
     &.on { background: var(--d-card); box-shadow: 0 1px 3px rgba(20, 40, 75, 0.15); }
@@ -217,7 +223,7 @@
 }
 
 // ---------- Table + pills ----------
-.tablewrap { overflow-x: auto; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; min-width: 560px; }
 th {
   text-align: left;
@@ -259,9 +265,10 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 // ---------- Quick actions ----------
 .qa {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 
-  .btn { margin-top: 0; width: 100%; text-align: center; }
+  .btn { margin-top: 0; width: 100%; box-sizing: border-box; text-align: center; }
 }
 
 // ---------- Warehouse analytics ----------
@@ -272,7 +279,7 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 .hbars { display: grid; gap: 12px; margin-top: 8px; }
 .hrow {
   display: grid;
-  grid-template-columns: 90px 1fr auto;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   font-size: 13px;
@@ -301,6 +308,7 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 
 // ---------- Layout ----------
 .main {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -309,34 +317,85 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 
-  &.two { grid-template-columns: repeat(2, 1fr); }
+  &.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .dash-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 20px;
   margin-top: 20px;
 
   .chart { margin-top: 0; min-width: 0; }
-  .span-12 { grid-column: span 12; }
-  .span-9 { grid-column: span 9; }
-  .span-7 { grid-column: span 7; }
-  .span-5 { grid-column: span 5; }
-  .span-3 { grid-column: span 3; }
+  .span-12 { grid-column: span 12; min-width: 0; }
+  .span-9 { grid-column: span 9; min-width: 0; }
+  .span-7 { grid-column: span 7; min-width: 0; }
+  .span-5 { grid-column: span 5; min-width: 0; }
+  .span-3 { grid-column: span 3; min-width: 0; }
 }
 
 // ---------- Responsive ----------
+
+// Tablet and phone: every card becomes full width, stacked in ONE column.
+// NOTE: the selector must be as specific as `.dash-grid .span-9` above.
+// The old `.dash-grid > *` lost to it, so the spans stayed (9 + 3 side by side)
+// and the cards overlapped on phones.
 @media (max-width: 1000px) {
-  .stat-grid { grid-template-columns: repeat(2, 1fr); }
-  .dash-grid > * { grid-column: span 12; }
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+
+    .span-12,
+    .span-9,
+    .span-7,
+    .span-5,
+    .span-3 { grid-column: 1 / -1; }
+  }
 }
 
 @media (max-width: 560px) {
   .main { padding: 16px; }
-  .stat-grid, .stat-grid.two { grid-template-columns: 1fr; }
-  .head-actions { width: 100%; .btn { flex: 1; text-align: center; } }
+
+  .stat-grid,
+  .stat-grid.two { grid-template-columns: minmax(0, 1fr); }
+
+  .dash-grid { gap: 16px; }
+
+  .head-actions {
+    width: 100%;
+    .btn { flex: 1; text-align: center; }
+  }
+
+  .notice { align-items: flex-start; }
+
+  // Needs-attention rows: let the action link drop under the text
+  .attn li { flex-wrap: wrap; }
+  .attn .link { margin-left: 22px; }
+
+  // Filter tabs scroll sideways instead of overflowing the card
+  .tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Bar-chart text is drawn in SVG units, so it shrinks with the chart.
+  // Make it bigger so it stays readable on a phone.
+  .chart-head ~ svg .ax { font-size: 16px; }
+
+  // Batch rows: label + value on top, bar underneath
+  .hrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label value'
+      'track track';
+    gap: 6px 12px;
+  }
+  .hl { grid-area: label; }
+  .hv { grid-area: value; }
+  .htrack { grid-area: track; }
 }

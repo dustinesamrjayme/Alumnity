@@ -1,7 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { Capacitor } from '@capacitor/core';
 import { BarcodeScanner, BarcodeFormat } from '@capacitor-mlkit/barcode-scanning';
+import { Html5Qrcode } from 'html5-qrcode';
 import { AuthService } from '../../../core/repositories/auth.service';
 import { EventsService } from '../../../core/repositories/events.service';
 import { RegistrationsService } from '../../../core/repositories/registrations.service';
@@ -17,7 +19,7 @@ import { DateLabelPipe, FeeLabelPipe } from '../../../shared/pipes/format.pipes'
   templateUrl: './scanner.page.html',
   styleUrl: './scanner.page.scss',
 })
-export class VolunteerScannerPage {
+export class VolunteerScannerPage implements OnDestroy {
   private route = inject(ActivatedRoute);
   auth = inject(AuthService);
   private events = inject(EventsService);
@@ -33,6 +35,11 @@ export class VolunteerScannerPage {
   offlineCachedOnly = signal(false);
   processingId = signal<number | null>(null);
   isScanning = signal(false);
+
+  // true on a real device (Android/iOS), false in `ionic serve`
+  isNative = Capacitor.isNativePlatform();
+  private webScanner: Html5Qrcode | null = null;
+  private handledScan = false;
 
   list = computed(() => {
     const q = this.search().toLowerCase().trim();
@@ -78,8 +85,25 @@ export class VolunteerScannerPage {
 
   // --- CAMERA LOGIC ---
   async startScan() {
+    if (this.isScanning()) return;
+    this.isScanning.set(true);
+
     try {
-      this.isScanning.set(true);
+      if (this.isNative) {
+        await this.scanNative();
+      } else {
+        await this.scanWeb();
+      }
+    } catch (e) {
+      console.error('Scan error:', e);
+      await this.toast('Camera failed to open. Use manual entry.');
+      await this.stopWebScan();
+    }
+  }
+
+  // Android / iOS (Capacitor ML Kit)
+  private async scanNative() {
+    try {
       const permission = await BarcodeScanner.requestPermissions();
       if (permission.camera !== 'granted') {
         await this.toast('Camera permission denied. Use manual entry.');
@@ -89,12 +113,45 @@ export class VolunteerScannerPage {
       if (barcodes.length > 0) {
         await this.manualLookup(barcodes[0].rawValue);
       }
-    } catch (e) {
-      await this.toast('Camera failed to open. Use manual entry.');
     } finally {
       this.isScanning.set(false);
     }
   }
+
+  // Browser (ionic serve) using html5-qrcode
+  private async scanWeb() {
+    this.handledScan = false;
+
+    // Wait one tick so #qr-reader becomes visible before the camera starts
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    this.webScanner = new Html5Qrcode('qr-reader');
+    await this.webScanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async (decodedText) => {
+        if (this.handledScan) return; // avoid firing twice
+        this.handledScan = true;
+        await this.stopWebScan();
+        await this.manualLookup(decodedText);
+      },
+      () => { /* ignore per-frame "no QR found" errors */ },
+    );
+  }
+
+  async stopWebScan() {
+    try {
+      if (this.webScanner?.isScanning) await this.webScanner.stop();
+      this.webScanner?.clear();
+    } catch { /* already stopped */ }
+    this.webScanner = null;
+    this.isScanning.set(false);
+  }
+
+  // Ionic hook: stop camera when leaving the page (pages are cached)
+  ionViewWillLeave() { void this.stopWebScan(); }
+
+  ngOnDestroy() { void this.stopWebScan(); }
 
   // --- LOOKUP LOGIC ---
   async manualLookup(code: string) {
@@ -103,8 +160,8 @@ export class VolunteerScannerPage {
 
     const attendee = this.attendees().find((a) => {
       const formattedId = `PLV-${a.registration_id.toString().padStart(5, '0')}`;
-      return a.qr_token === code.trim() || 
-             formattedId === cleanCode || 
+      return a.qr_token === code.trim() ||
+             formattedId === cleanCode ||
              a.registration_id.toString() === cleanCode;
     });
 
@@ -121,7 +178,6 @@ export class VolunteerScannerPage {
       return;
     }
 
-    // REMOVED: The unpaid check. We just check them in now.
     await this.checkInNow(attendee);
   }
 
@@ -138,15 +194,15 @@ export class VolunteerScannerPage {
 
     try {
       await this.checkIn.enqueue(item);
-      
-      // Optimistic UI update: Auto-mark as paid if they were unpaid
-      this.attendees.update(list => list.map(x => 
-        x.registration_id === a.registration_id 
-          ? { 
-              ...x, 
+
+      // Optimistic UI update: auto-mark as paid if they were unpaid
+      this.attendees.update(list => list.map(x =>
+        x.registration_id === a.registration_id
+          ? {
+              ...x,
               attendee_status: 'checked_in',
               payment_status: x.payment_status === 'unpaid' ? 'paid' : x.payment_status
-            } 
+            }
           : x
       ));
 
