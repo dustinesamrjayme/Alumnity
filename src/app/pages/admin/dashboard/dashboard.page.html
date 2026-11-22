@@ -91,7 +91,7 @@
           <small class="small">Joined since the 1st</small>
         </div>
       </div>
-
+      
       <!-- Charts -->
       <div class="dash-grid">
         <div class="card chart span-9">
@@ -224,6 +224,82 @@
                     <div [title]="p.rate + '% checked in'">
                       <i class="dot" [style.background]="p.fill"></i>{{ p.label }}
                       <b>{{ p.registrations }}</b> <span class="mute">· {{ p.pct }}%</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="empty-inline">No data yet.</div>
+            }
+          }
+        </div>
+
+                <!-- Users by Department section -->
+            <div class="card chart span-9">
+          <div class="chart-head">
+            <h2>Total Alumni Growth</h2>
+            <div class="small mute">Cumulative accounts over time</div>
+          </div>
+          
+          @if (singleLineChart(); as chart) {
+            <svg viewBox="0 0 620 230" role="img" aria-label="Total alumni growth line chart">
+              <!-- Grid -->
+              <g class="gl">
+                @for (t of chart.ticks; track t.y) {
+                  <line [attr.x1]="40" [attr.x2]="600" [attr.y1]="t.y" [attr.y2]="t.y" />
+                }
+              </g>
+              <!-- Y-Axis -->
+              <g class="ax" text-anchor="end">
+                @for (t of chart.ticks; track t.y) {
+                  <text x="32" [attr.y]="t.y + 4">{{ t.val }}</text>
+                }
+              </g>
+
+              <!-- The Line -->
+              <path [attr.d]="chart.path" fill="none" stroke="var(--d-blue)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              
+              <!-- The Dots -->
+              @for (p of chart.points; track p.x) {
+                <circle [attr.cx]="p.x" [attr.cy]="p.y" r="4" fill="var(--d-card)" stroke="var(--d-blue)" stroke-width="2.5" />
+                <title>{{ p.val }} total alumni</title>
+              }
+
+              <!-- X-Axis -->
+              <g class="ax" text-anchor="middle">
+                @for (l of chart.labels; track l.x) {
+                  <text [attr.x]="l.x" y="212">{{ l.text }}</text>
+                }
+              </g>
+            </svg>
+          } @else {
+            <div class="empty-inline">No alumni data yet.</div>
+          }
+        </div>
+        <div class="card chart span-3">
+          <h2>By Deptartment</h2>
+          @if (userPie(); as pie) {
+            @if (pie.total) {
+              <div class="dn">
+                <svg viewBox="0 0 140 140" role="img"
+                     [attr.aria-label]="'Users by department, ' + pie.total + ' in total'">
+                  @for (p of pie.slices; track p.label) {
+                    @if (p.path) {
+                      <path class="pie-s" [attr.d]="p.path" [attr.fill]="p.fill">
+                        <title>{{ p.label }}: {{ p.value }} users ({{ p.pct }}%)</title>
+                      </path>
+                    } @else {
+                      <circle class="pie-s" cx="70" cy="70" r="62" [attr.fill]="p.fill">
+                        <title>{{ p.label }}: {{ p.value }} users (100%)</title>
+                      </circle>
+                    }
+                  }
+                </svg>
+                <div class="legend">
+                  @for (p of pie.slices; track p.label) {
+                    <div [title]="p.value + ' total users'">
+                      <i class="dot" [style.background]="p.fill"></i>{{ p.label }}
+                      <b>{{ p.value }}</b> <span class="mute">· {{ p.pct }}%</span>
                     </div>
                   }
                 </div>

@@ -399,3 +399,49 @@ tbody tr:hover { background: rgba(36, 87, 166, 0.04); }
   .hv { grid-area: value; }
   .htrack { grid-area: track; }
 }
+
+
+.hbars { 
+  display: grid; 
+  gap: 16px; 
+  margin-top: 12px; 
+}
+
+.hrow {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) 100px; /* More room for the value */
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.hl {
+  font-weight: 700; /* Made the label bolder */
+  color: var(--d-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.htrack {
+  height: 14px; /* Taller bars */
+  border-radius: 99px;
+  background: var(--paper, #fcfdfe);
+  border: 1px solid var(--d-line);
+  overflow: hidden; /* Ensures the color fill respects the rounded corners */
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease-in-out; /* Smooth animation when changing filters */
+  }
+}
+
+.hv { 
+  font-weight: 800; 
+  text-align: right; /* Aligns the numbers to the right */
+  white-space: nowrap; 
+  
+  .mute { font-weight: 500; }
+}

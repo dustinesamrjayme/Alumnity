@@ -4,6 +4,8 @@ import { AdminService, AlumniSummary } from '../admin.service';
 import { RegistrationTrendPoint, BatchPoint, DepartmentPoint } from '../admin.service';
 import { SUPABASE_CLIENT } from '../../supabase-client'
 import { SupabaseClient } from '@supabase/supabase-js';
+import { DepartmentUserStats } from '../../department-user-stats';
+import { TotalAlumniGrowthPoint } from '../../total-alumni-growth-point';
 
 @Injectable()
 export class SupabaseAdminService extends AdminService {
@@ -46,16 +48,27 @@ export class SupabaseAdminService extends AdminService {
   async alumniSummary(): Promise<AlumniSummary> {
     return this.unwrap(await this.sb.rpc('get_alumni_summary'));
   }
-  async analyticsTrend(): Promise<RegistrationTrendPoint[]> {
-    return (this.unwrap(await this.sb.rpc('get_registration_trend')) ?? []) as RegistrationTrendPoint[];
-  }
-  async analyticsByBatch(): Promise<BatchPoint[]> {
-    return (this.unwrap(await this.sb.rpc('get_registrations_by_batch')) ?? []) as BatchPoint[];
-  }
-  async analyticsByDepartment(): Promise<DepartmentPoint[]> {
-    return (this.unwrap(await this.sb.rpc('get_registrations_by_department')) ?? []) as DepartmentPoint[];
-  }
   async refreshAnalytics(): Promise<void> {
     this.unwrap(await this.sb.rpc('refresh_analytics'));
+  }
+
+  async analyticsTrend(startDate?: string | null): Promise<RegistrationTrendPoint[]> {
+    return this.unwrap(await this.sb.rpc('analytics_trend', { p_start_date: startDate ?? null }));
+  }
+
+  async analyticsByBatch(startDate?: string | null): Promise<BatchPoint[]> {
+    return this.unwrap(await this.sb.rpc('analytics_by_batch', { p_start_date: startDate ?? null }));
+  }
+
+  async analyticsByDepartment(startDate?: string | null): Promise<DepartmentPoint[]> {
+    return this.unwrap(await this.sb.rpc('analytics_by_department', { p_start_date: startDate ?? null }));
+  }
+
+  async userCountsByDepartment(startDate?: string | null): Promise<DepartmentUserStats[]> {
+    return this.unwrap(await this.sb.rpc('get_user_counts_by_department', { p_start_date: startDate ?? null }));
+  }
+
+  async totalAlumniGrowth(startDate?: string | null): Promise<TotalAlumniGrowthPoint[]> {
+   return this.unwrap(await this.sb.rpc('get_total_alumni_growth', { p_start_date: startDate ?? null }));
   }
 }

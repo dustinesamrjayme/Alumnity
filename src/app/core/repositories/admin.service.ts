@@ -1,5 +1,6 @@
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../models';
-
+import {DepartmentUserStats} from '../../core/department-user-stats';
+import { TotalAlumniGrowthPoint } from '../total-alumni-growth-point';
 
 export interface RegistrationTrendPoint { year: number; month: number; registrations: number; revenue: number; }
 export interface BatchPoint { batch: number; registrations: number; checked_in: number; }
@@ -18,8 +19,10 @@ export abstract class AdminService {
   abstract finalizePastEvents(graceHours?: number): Promise<number>;
   abstract alumniSummary(): Promise<AlumniSummary>;
 
-  abstract analyticsTrend(): Promise<RegistrationTrendPoint[]>;
-  abstract analyticsByBatch(): Promise<BatchPoint[]>;
-  abstract analyticsByDepartment(): Promise<DepartmentPoint[]>;
+  abstract analyticsTrend(startDate?: string | null): Promise<RegistrationTrendPoint[]>;
+  abstract analyticsByBatch(startDate?: string | null): Promise<BatchPoint[]>;
+  abstract analyticsByDepartment(startDate?: string | null): Promise<DepartmentPoint[]>;
+  abstract userCountsByDepartment(startDate?: string | null): Promise<DepartmentUserStats[]>;
   abstract refreshAnalytics(): Promise<void>;
+  abstract totalAlumniGrowth(startDate?: string | null): Promise<TotalAlumniGrowthPoint[]>;
 }

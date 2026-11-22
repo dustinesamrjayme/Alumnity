@@ -8,6 +8,8 @@ import {
 } from '../../../core/repositories/admin.service';
 import { EventsService } from '../../../core/repositories/events.service';
 import { EventDashboardStats, EventItem } from '../../../core/models';
+import { DepartmentUserStats } from '../../../core/department-user-stats';
+import { TotalAlumniGrowthPoint } from '../../../core/total-alumni-growth-point';
 
 // events.status is 'listed' | 'closed' in the DB; the rest is derived from date + capacity.
 type EventStatus = 'open' | 'full' | 'ended' | 'closed';
@@ -25,9 +27,6 @@ interface AttentionItem {
 const X0 = 40, X1 = 600, Y_TOP = 30, Y_BASE = 190;
 const R = 52;
 const CIRC = 2 * Math.PI * R;
-
-// If your `registered` stat already EXCLUDES cancelled registrations, leave this false.
-// If it counts every row (cancelled included), set it to true and the numbers correct themselves.
 const REGISTERED_INCLUDES_CANCELLED = false;
 
 // Same default grace period as finalize_past_events(p_grace_hours) in the database.
@@ -82,6 +81,8 @@ export class DashboardPage {
   finalizing = signal(false);
   loading = signal(true);
   error = signal<string | null>(null);
+  userDeptStats = signal<DepartmentUserStats[]>([]);
+  alumniGrowth = signal<TotalAlumniGrowthPoint[]>([]);
 
   constructor() { void this.load(); }
 
@@ -187,6 +188,59 @@ export class DashboardPage {
       const tb = b.date?.getTime() ?? Infinity;
       return f === 'past' ? tb - ta : ta - tb;
     });
+  });
+
+    // Bar Chart: Alumni by Department
+   // Bar Chart: Alumni by Department
+  alumniDeptBars = computed(() => {
+    const raw = this.userDeptStats();
+    const max = Math.max(1, ...raw.map(s => s.alumni_count));
+    
+    return [...raw]
+      .sort((a, b) => b.alumni_count - a.alumni_count)
+      .map((s) => {
+        // Find the original index to match the pie chart's color assignment
+        const originalIndex = raw.findIndex(r => r.department === s.department);
+        return {
+          label: s.department,
+          value: s.alumni_count,
+          width: (s.alumni_count / max) * 100,
+          total: s.total_users,
+          color: PIE_COLORS[originalIndex % PIE_COLORS.length] // <-- Matches the pie chart
+        };
+      });
+  });
+
+    // Pie Chart: Alumni by Department (Matches the line graph)
+  userPie = computed(() => {
+    // 1. Change filter and total to use alumni_count
+    const stats = this.userDeptStats().filter(s => s.alumni_count > 0);
+    const total = stats.reduce((n, s) => n + s.alumni_count, 0);
+    
+    const CX = 70, CY = 70, PR = 62;
+    let angle = -Math.PI / 2;
+    
+    const slices = stats.map((s, i) => {
+      // 2. Use alumni_count for the slice fraction
+      const frac = s.alumni_count / total;
+      const a0 = angle;
+      const a1 = angle + frac * 2 * Math.PI;
+      angle = a1;
+      
+      const x0 = CX + PR * Math.cos(a0), y0 = CY + PR * Math.sin(a0);
+      const x1 = CX + PR * Math.cos(a1), y1 = CY + PR * Math.sin(a1);
+      const full = frac >= 0.9999;
+      
+      return {
+        label: s.department,
+        value: s.alumni_count, // 3. Change this to alumni_count
+        pct: Math.round(frac * 100),
+        fill: PIE_COLORS[i % PIE_COLORS.length],
+        path: full ? null
+          : `M ${CX} ${CY} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${PR} ${PR} 0 ${frac > 0.5 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`,
+      };
+    });
+    return { total, slices };
   });
 
   // ---------- headline numbers ----------
@@ -305,14 +359,19 @@ export class DashboardPage {
     this.analyticsLoading.set(true);
     this.analyticsError.set(null);
     try {
-      const [t, b, d] = await Promise.all([
+      const [t, b, d, u, g] = await Promise.all([
         this.admin.analyticsTrend(),
         this.admin.analyticsByBatch(),
         this.admin.analyticsByDepartment(),
+        this.admin.userCountsByDepartment(),
+        this.admin.totalAlumniGrowth(),
+
       ]);
       this.trend.set(t);
       this.byBatch.set(b);
       this.byDept.set(d);
+      this.userDeptStats.set(u);
+      this.alumniGrowth.set(g);
     } catch (e) {
       this.analyticsError.set((e as Error).message || 'Could not load analytics.');
     } finally {
@@ -425,6 +484,44 @@ export class DashboardPage {
       };
     });
     return { total, slices };
+  });
+
+  singleLineChart = computed(() => {
+    const data = this.alumniGrowth();
+    if (!data.length) return null;
+
+    const maxY = Math.max(...data.map(d => d.cumulative_count), 4);
+    const X0 = 40, X1 = 580, Y_TOP = 30, Y_BASE = 190;
+
+    const getX = (index: number) => 
+      data.length === 1 ? (X0 + X1) / 2 : X0 + ((X1 - X0) / (data.length - 1)) * index;
+
+    const getY = (val: number) => Y_BASE - (val / maxY) * (Y_BASE - Y_TOP);
+
+    const points = data.map((d, i) => ({
+      x: getX(i),
+      y: getY(d.cumulative_count),
+      val: d.cumulative_count
+    }));
+
+   const path = points.length === 1 
+    ? `M ${X0} ${points[0].y} L ${X1} ${points[0].y}` // <-- This draws the flat line!
+    : points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+    const labels = data.map((d, i) => {
+      const date = new Date(d.date_str + '-01');
+      return {
+        x: getX(i),
+        text: date.toLocaleString('en', { month: 'short' }) + " '" + String(date.getFullYear()).slice(2)
+      };
+    });
+
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map(pct => ({
+      val: Math.round(maxY * pct),
+      y: getY(maxY * pct)
+    }));
+
+    return { points, path, labels, ticks };
   });
 
   // ---------- actions ----------

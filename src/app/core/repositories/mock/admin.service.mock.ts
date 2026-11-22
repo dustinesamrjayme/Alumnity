@@ -3,6 +3,8 @@ import { MockDatabase } from './mock-database.service';
 import { AdminService, AlumniSummary } from '../admin.service';
 import { AppUser, AuditLogEntry, EventDashboardStats, UserRole } from '../../models';
 import { RegistrationTrendPoint, BatchPoint, DepartmentPoint } from '../admin.service';
+import { DepartmentUserStats } from '../../department-user-stats';
+import { TotalAlumniGrowthPoint } from '../../total-alumni-growth-point';
 
 @Injectable()
 export class MockAdminService extends AdminService {
@@ -148,4 +150,13 @@ export class MockAdminService extends AdminService {
     ];
   }
   async refreshAnalytics(): Promise<void> { this.guardAdmin(); }
+
+
+  async userCountsByDepartment(): Promise<DepartmentUserStats[]> {
+    return [];
+  }
+
+  async totalAlumniGrowth(startDate?: string | null): Promise<TotalAlumniGrowthPoint[]> {
+    return [];
+  }
 }
