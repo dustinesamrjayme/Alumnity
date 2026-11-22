@@ -37,7 +37,7 @@ export class VolunteerScannerPage implements OnDestroy {
   isScanning = signal(false);
 
   // true on a real device (Android/iOS), false in `ionic serve`
-  isNative = Capacitor.isNativePlatform();
+  isNative = false;
   private webScanner: Html5Qrcode | null = null;
   private handledScan = false;
 
@@ -95,10 +95,15 @@ export class VolunteerScannerPage implements OnDestroy {
         await this.scanWeb();
       }
     } catch (e) {
-      console.error('Scan error:', e);
-      await this.toast('Camera failed to open. Use manual entry.');
-      await this.stopWebScan();
-    }
+  const msg = String((e as any)?.message ?? e).toLowerCase();
+  const cancelled = msg.includes('cancel');
+
+  if (!cancelled) {
+    console.error('Scan error:', e);
+    await this.toast('Camera failed to open. Use manual entry.');
+  }
+  await this.stopWebScan();
+}
   }
 
   // Android / iOS (Capacitor ML Kit)
